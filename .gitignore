@@ -1,0 +1,7 @@
+*.suo
+multiplayer/multiplayer/bin
+multiplayer/multiplayer/obj
+multiplayer/server/bin
+multiplayer/server/obj
+multiplayer/packages
+multiplayer/packages/Newtonsoft.Json.8.0.3/lib/net20/Newtonsoft.Json.dll
