@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
+using System;
 
 namespace memewars
 {
@@ -45,14 +46,27 @@ namespace memewars
 		{
 			// read inputs
 			float h = CrossPlatformInputManager.GetAxis("Horizontal");
+			/*
+			bool
+				isRight = Input.GetKey(KeyCode.D),
+				isLeft = Input.GetKey(KeyCode.A);
+			if (isRight || isLeft)
+			{
+				if (isRight)
+					h = 1;
+				else if (isLeft)
+					h = -1;
+			}
+			*/
+
 			float v = CrossPlatformInputManager.GetAxis("Vertical");
-			bool crouch = Input.GetKey(KeyCode.C);
+			bool crouch = Input.GetKey(KeyCode.LeftControl);
 
 			// calculate move direction to pass to character
 			if (this.m_Cam != null)
 			{
 				// calculate camera relative direction to move:
-				this.m_CamForward = Vector3.Scale(this.m_Cam.forward, new Vector3(1, 0, 1)).normalized;
+				// this.m_CamForward = Vector3.Scale(this.m_Cam.forward, new Vector3(1, 0, 1)).normalized;
 				this.m_Move = v * this.m_CamForward + h * this.m_Cam.right;
 			}
 			else

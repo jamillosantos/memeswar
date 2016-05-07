@@ -42,14 +42,14 @@ namespace memewars {
 
 		void Start()
 		{
-			m_Animator = GetComponent<Animator>();
-			m_Rigidbody = GetComponent<Rigidbody>();
-			m_Capsule = GetComponent<CapsuleCollider>();
-			m_CapsuleHeight = m_Capsule.height;
-			m_CapsuleCenter = m_Capsule.center;
+			this.m_Animator = this.GetComponent<Animator>();
+			this.m_Rigidbody = this.GetComponent<Rigidbody>();
+			this.m_Capsule = this.GetComponent<CapsuleCollider>();
+			this.m_CapsuleHeight = this.m_Capsule.height;
+			this.m_CapsuleCenter = this.m_Capsule.center;
 
-			m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
-			m_OrigGroundCheckDistance = m_GroundCheckDistance;
+			this.m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+			this.m_OrigGroundCheckDistance = this.m_GroundCheckDistance;
 		}
 
 
@@ -59,54 +59,59 @@ namespace memewars {
 			// convert the world relative moveInput vector into a local-relative
 			// turn amount and forward amount required to head in the desired
 			// direction.
-			if (move.magnitude > 1f) move.Normalize();
-			move = transform.InverseTransformDirection(move);
-			CheckGroundStatus();
-			move = Vector3.ProjectOnPlane(move, m_GroundNormal);
-			m_TurnAmount = Mathf.Atan2(move.x, move.z);
-			m_ForwardAmount = move.z;
+			if (move.magnitude > 1f)
+				move.Normalize();
 
-			ApplyExtraTurnRotation();
+			move = this.transform.InverseTransformDirection(move);
+
+			this.CheckGroundStatus();
+
+			move = Vector3.ProjectOnPlane(move, this.m_GroundNormal);
+			this.m_TurnAmount = Mathf.Atan2(move.x, move.z);
+			this.m_ForwardAmount = move.z;
+
+			this.ApplyExtraTurnRotation();
 
 			// control and velocity handling is different when grounded and airborne:
 			if (m_IsGrounded)
 			{
-				HandleGroundedMovement(crouch, jump);
+				this.HandleGroundedMovement(crouch, jump);
 			}
 			else
 			{
-				HandleAirborneMovement();
+				this.HandleAirborneMovement();
 			}
 
-			ScaleCapsuleForCrouching(crouch);
-			PreventStandingInLowHeadroom();
+			this.ScaleCapsuleForCrouching(crouch);
+			this.PreventStandingInLowHeadroom();
 
 			// send input and other state parameters to the animator
-			UpdateAnimator(move);
+			this.UpdateAnimator(move);
 		}
 
 
 		void ScaleCapsuleForCrouching(bool crouch)
 		{
-			if (m_IsGrounded && crouch)
+			if (this.m_IsGrounded && crouch)
 			{
-				if (m_Crouching) return;
-				m_Capsule.height = m_Capsule.height / 2f;
-				m_Capsule.center = m_Capsule.center / 2f;
-				m_Crouching = true;
+				if (this.m_Crouching)
+					return;
+				this.m_Capsule.height = this.m_Capsule.height / 2f;
+				this.m_Capsule.center = this.m_Capsule.center / 2f;
+				this.m_Crouching = true;
 			}
 			else
 			{
-				Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-				float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-				if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, ~0, QueryTriggerInteraction.Ignore))
+				Ray crouchRay = new Ray(this.m_Rigidbody.position + Vector3.up * this.m_Capsule.radius * k_Half, Vector3.up);
+				float crouchRayLength = this.m_CapsuleHeight - m_Capsule.radius * k_Half;
+				if (Physics.SphereCast(crouchRay, this.m_Capsule.radius * k_Half, crouchRayLength, ~0, QueryTriggerInteraction.Ignore))
 				{
-					m_Crouching = true;
+					this.m_Crouching = true;
 					return;
 				}
-				m_Capsule.height = m_CapsuleHeight;
-				m_Capsule.center = m_CapsuleCenter;
-				m_Crouching = false;
+				this.m_Capsule.height = m_CapsuleHeight;
+				this.m_Capsule.center = m_CapsuleCenter;
+				this.m_Crouching = false;
 			}
 		}
 
@@ -128,48 +133,41 @@ namespace memewars {
 		void UpdateAnimator(Vector3 move)
 		{
 			// update the animator parameters
-			m_Animator.SetFloat("Forward", m_ForwardAmount, 0.5f, Time.deltaTime);
-			m_Animator.SetFloat("Turn", m_TurnAmount, 0.5f, Time.deltaTime);
-			m_Animator.SetBool("Crouch", m_Crouching);
-			m_Animator.SetBool("OnGround", m_IsGrounded);
-			if (!m_IsGrounded)
-			{
-				m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
-			}
+			this.m_Animator.SetFloat("Forward", this.m_ForwardAmount, 0.5f, Time.deltaTime);
+			this.m_Animator.SetFloat("Turn", this.m_TurnAmount, 0.5f, Time.deltaTime);
+			this.m_Animator.SetBool("Crouch", this.m_Crouching);
+			this.m_Animator.SetBool("OnGround", this.m_IsGrounded);
+			if (!this.m_IsGrounded)
+				this.m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
 
 			// calculate which leg is behind, so as to leave that leg trailing in the jump animation
 			// (This code is reliant on the specific run cycle offset in our animations,
 			// and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
-			float runCycle =
-				Mathf.Repeat(
-					m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
+			float runCycle = Mathf.Repeat(this.m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + this.m_RunCycleLegOffset, 1);
 			float jumpLeg = (runCycle < k_Half ? 1 : -1) * m_ForwardAmount;
-			if (m_IsGrounded)
+			if (this.m_IsGrounded)
 			{
-				m_Animator.SetFloat("JumpLeg", jumpLeg);
+				this.m_Animator.SetFloat("JumpLeg", jumpLeg);
 			}
 
 			// the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
 			// which affects the movement speed because of the root motion.
-			if (m_IsGrounded && move.magnitude > 0)
-			{
-				m_Animator.speed = m_AnimSpeedMultiplier;
-			}
+			if (this.m_IsGrounded && move.magnitude > 0)
+				this.m_Animator.speed = m_AnimSpeedMultiplier;
 			else
-			{
 				// don't use that while airborne
-				m_Animator.speed = 1;
-			}
+				this.m_Animator.speed = 1;
 		}
 
 
 		void HandleAirborneMovement()
 		{
+			Debug.Log("Vixi!");
 			// apply extra gravity from multiplier:
 			Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
-			m_Rigidbody.AddForce(extraGravityForce);
+			this.m_Rigidbody.AddForce(extraGravityForce);
 
-			m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
+			this.m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
 		}
 
 
@@ -179,10 +177,10 @@ namespace memewars {
 			if (jump && !crouch && m_Animator.GetCurrentAnimatorStateInfo(0).IsName("Grounded"))
 			{
 				// jump!
-				m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, m_JumpPower, m_Rigidbody.velocity.z);
-				m_IsGrounded = false;
-				m_Animator.applyRootMotion = false;
-				m_GroundCheckDistance = 0.1f;
+				this.m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, m_JumpPower, m_Rigidbody.velocity.z);
+				this.m_IsGrounded = false;
+				this.m_Animator.applyRootMotion = false;
+				this.m_GroundCheckDistance = 0.1f;
 			}
 		}
 
@@ -200,14 +198,14 @@ namespace memewars {
 			// this allows us to modify the positional speed before it's applied.
 			if (m_IsGrounded && Time.deltaTime > 0)
 			{
-				Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+				// Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
+				Vector3 v = (m_Animator.deltaPosition) / Time.deltaTime;
 
 				// we preserve the existing y part of the current velocity.
 				v.y = m_Rigidbody.velocity.y;
 				m_Rigidbody.velocity = v;
 			}
 		}
-
 
 		void CheckGroundStatus()
 		{
@@ -220,15 +218,15 @@ namespace memewars {
 			// it is also good to note that the transform position in the sample assets is at the base of the character
 			if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
 			{
-				m_GroundNormal = hitInfo.normal;
-				m_IsGrounded = true;
-				m_Animator.applyRootMotion = true;
+				this.m_GroundNormal = hitInfo.normal;
+				this.m_IsGrounded = true;
+				this.m_Animator.applyRootMotion = true;
 			}
 			else
 			{
-				m_IsGrounded = false;
-				m_GroundNormal = Vector3.up;
-				m_Animator.applyRootMotion = false;
+				this.m_IsGrounded = false;
+				this.m_GroundNormal = Vector3.up;
+				this.m_Animator.applyRootMotion = false;
 			}
 		}
 	}
