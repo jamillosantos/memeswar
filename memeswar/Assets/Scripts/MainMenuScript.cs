@@ -13,18 +13,19 @@ public class MainMenuScript : MonoBehaviour
 
 	public Button Quit;
 
-	public Image img;
+	public Canvas QuitGameConfirmationCanvas;
 
-	public Canvas QuitGameConfirmation;
+	public Canvas FindGameCanvas;
 
 	void Start()
 	{
-		this.QuitGameConfirmation.enabled = false;
+		this.QuitGameConfirmationCanvas.enabled = false;
+		this.FindGameCanvas.enabled = false;
 	}
 
 	public void FindGameClick()
 	{
-
+		this.FindGameCanvas.enabled = true;
 	}
 
 	public void CreateGameClick()
@@ -39,8 +40,7 @@ public class MainMenuScript : MonoBehaviour
 
 	public void QuitClick()
 	{
-		Debug.Log(this.QuitGameConfirmation);
-		this.QuitGameConfirmation.enabled = true;
+		this.QuitGameConfirmationCanvas.enabled = true;
 	}
 
 	public void QuitYesClick()
@@ -50,6 +50,6 @@ public class MainMenuScript : MonoBehaviour
 
 	public void QuitNoClick()
 	{
-		this.QuitGameConfirmation.enabled = false;
+		this.QuitGameConfirmationCanvas.enabled = false;
 	}
 }

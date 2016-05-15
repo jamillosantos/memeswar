@@ -17,7 +17,7 @@ public class SplashScreenAnimations : MonoBehaviour
 
 	public Image Macambira;
 
-	public AudioSource audio;
+	public AudioSource BackgroundAudio;
 
 	void Start ()
 	{
@@ -51,10 +51,11 @@ public class SplashScreenAnimations : MonoBehaviour
 		this.Macambira.color = color;
 
 		if (Time.timeSinceLevelLoad > MACAMBIRA_FADEOUT - FADE_DURATION)
-			this.audio.volume = this.alphaAnimate(MACAMBIRA_FADEIN, MACAMBIRA_FADEOUT, FADE_DURATION);
+			this.BackgroundAudio.volume = this.alphaAnimate(MACAMBIRA_FADEIN, MACAMBIRA_FADEOUT, FADE_DURATION);
 
 		if (Time.timeSinceLevelLoad > MACAMBIRA_FADEOUT + 1f)
 		{
+			Debug.Log("Aqui!!!");
 			SceneManager.LoadScene("MainMenu");
 		}
 	}
