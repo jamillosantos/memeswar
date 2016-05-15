@@ -13,6 +13,8 @@ public class MainMenuScript : MonoBehaviour
 
 	public Button Quit;
 
+	public Image img;
+
 	public Canvas QuitGameConfirmation;
 
 	void Start()
