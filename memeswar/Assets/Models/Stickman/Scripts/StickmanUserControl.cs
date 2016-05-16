@@ -12,7 +12,7 @@ namespace memewars
 		private Transform m_Cam;                  // A reference to the main camera in the scenes transform
 		private Vector3 m_CamForward;             // The current forward direction of the camera
 		private Vector3 m_Move;
-		private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
+		private bool _jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
 
 
 		private void Start()
@@ -34,54 +34,39 @@ namespace memewars
 
 		private void Update()
 		{
-			if (!this.m_Jump)
+			if (this.m_Character.IsGrounded)
 			{
-				this.m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+				if (!this._jump)
+					this._jump = CrossPlatformInputManager.GetButtonDown("Jump");
 			}
+			else
+				this.m_Character.JetPackOn = Input.GetKey(KeyCode.Space);
 		}
 
 
 		// Fixed update is called in sync with physics
 		private void FixedUpdate()
 		{
-			// read inputs
-			float h = CrossPlatformInputManager.GetAxis("Horizontal");
-			/*
+			if (this._jump)
+				this.m_Character.Jump();
+
+			this.m_Move.x = 0;
 			bool
 				isRight = Input.GetKey(KeyCode.D),
 				isLeft = Input.GetKey(KeyCode.A);
-			if (isRight || isLeft)
+			if (!(isRight && isLeft) && (isRight || isLeft))
 			{
 				if (isRight)
-					h = 1;
+					this.m_Move.x = 1;
 				else if (isLeft)
-					h = -1;
+					this.m_Move.x = -1;
 			}
-			*/
+			if (Input.GetKey(KeyCode.LeftShift))
+				this.m_Move.x *= 0.5f;
 
-			float v = CrossPlatformInputManager.GetAxis("Vertical");
 			bool crouch = Input.GetKey(KeyCode.LeftControl);
-
-			// calculate move direction to pass to character
-			if (this.m_Cam != null)
-			{
-				// calculate camera relative direction to move:
-				// this.m_CamForward = Vector3.Scale(this.m_Cam.forward, new Vector3(1, 0, 1)).normalized;
-				this.m_Move = v * this.m_CamForward + h * this.m_Cam.right;
-			}
-			else
-			{
-				// we use world-relative directions in the case of no main camera
-				this.m_Move = v * Vector3.forward + h * Vector3.right;
-			}
-#if !MOBILE_INPUT
-			// walk speed multiplier
-			if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
-#endif
-
-			// pass all parameters to the character control script
-			this.m_Character.Move(m_Move, crouch, m_Jump);
-			this.m_Jump = false;
+			this.m_Character.Move(this.m_Move);
+			this._jump = false;
 		}
 	}
 }

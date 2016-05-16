@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace memewars {
 
@@ -8,12 +9,14 @@ namespace memewars {
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : MonoBehaviour
 	{
+		public float MaxHorizontalSpeed = 7f;
+
 		[SerializeField]
 		float m_MovingTurnSpeed = 360;
 		[SerializeField]
 		float m_StationaryTurnSpeed = 180;
 		[SerializeField]
-		float m_JumpPower = 12f;
+		float m_JumpPower = 9f;
 		[Range(1f, 4f)]
 		[SerializeField]
 		float m_GravityMultiplier = 2f;
@@ -28,7 +31,7 @@ namespace memewars {
 
 		Rigidbody m_Rigidbody;
 		Animator m_Animator;
-		bool m_IsGrounded;
+		bool _isGrounded;
 		float m_OrigGroundCheckDistance;
 		const float k_Half = 0.5f;
 		float m_TurnAmount;
@@ -39,9 +42,29 @@ namespace memewars {
 		CapsuleCollider m_Capsule;
 		bool m_Crouching;
 
+		private float _jumpTime = 0;
+		private float _jetpackTime = 0;
+
+		private float _jetpackCapacity = 3f;
+		private float _jetpackReloadDuration = 5f;
+		private float _jetpackFuel;
+		private float _jetpackReloadRatio;
+
+		public bool IsGrounded
+		{
+			get
+			{
+				return this._isGrounded;
+			}
+		}
+
+		public bool JetPackOn { get; set; }
 
 		void Start()
 		{
+			this._jetpackFuel = this._jetpackCapacity;
+			this._jetpackReloadRatio = (this._jetpackCapacity / this._jetpackReloadDuration);
+
 			this.m_Animator = this.GetComponent<Animator>();
 			this.m_Rigidbody = this.GetComponent<Rigidbody>();
 			this.m_Capsule = this.GetComponent<CapsuleCollider>();
@@ -52,117 +75,81 @@ namespace memewars {
 			this.m_OrigGroundCheckDistance = this.m_GroundCheckDistance;
 		}
 
-
-		public void Move(Vector3 move, bool crouch, bool jump)
+		public void JetPackUpdate()
 		{
+			if (this.JetPackOn && (!this.IsGrounded) && (Time.time >= this._jetpackTime) && (this._jetpackFuel > 0f))
+			{
+				Vector3 v = this.m_Rigidbody.velocity;
+				v.y = Math.Min(v.y + 15f * Time.deltaTime, 4f);
+				this.m_Rigidbody.velocity = v;
+				this._jetpackFuel = Math.Max(0f, this._jetpackFuel - Time.deltaTime);
+			}
+			else if (!this.JetPackOn)
+				this._jetpackFuel = Math.Min(this._jetpackFuel + this._jetpackReloadRatio * Time.deltaTime, this._jetpackCapacity);
+		}
 
-			// convert the world relative moveInput vector into a local-relative
-			// turn amount and forward amount required to head in the desired
-			// direction.
-			if (move.magnitude > 1f)
-				move.Normalize();
+		public void Jump()
+		{
+			if (this._isGrounded)
+			{
+				this._jumpTime = Time.time;
+				this._jetpackTime = this._jumpTime + 0.5f; // 0.5 segundos
+				Vector3 v = this.m_Rigidbody.velocity;
+				v.y += this.m_JumpPower;
+				this.m_Rigidbody.velocity = v;
+				this._isGrounded = false;
+			}
+		}
 
-			move = this.transform.InverseTransformDirection(move);
+		public void Move(Vector3 move)
+		{
+			if (move.x != 0)
+				this.m_Rigidbody.transform.rotation = Quaternion.Euler(0, 90 * (move.x > 0 ? 1f : -1f), 0);
 
 			this.CheckGroundStatus();
 
-			move = Vector3.ProjectOnPlane(move, this.m_GroundNormal);
-			this.m_TurnAmount = Mathf.Atan2(move.x, move.z);
-			this.m_ForwardAmount = move.z;
-
-			this.ApplyExtraTurnRotation();
-
-			// control and velocity handling is different when grounded and airborne:
-			if (m_IsGrounded)
-			{
-				this.HandleGroundedMovement(crouch, jump);
-			}
+			Vector3 v = this.m_Rigidbody.velocity;
+			if (this._isGrounded)
+				v.x = move.x * this.MaxHorizontalSpeed;
 			else
-			{
-				this.HandleAirborneMovement();
-			}
+				v.x = Math.Min(Math.Max(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed), this.MaxHorizontalSpeed);
+			this.m_Rigidbody.velocity = v;
 
-			this.ScaleCapsuleForCrouching(crouch);
-			this.PreventStandingInLowHeadroom();
+			this.JetPackUpdate();
 
-			// send input and other state parameters to the animator
-			this.UpdateAnimator(move);
+			this.UpdateAnimator();
 		}
 
-
-		void ScaleCapsuleForCrouching(bool crouch)
+		void UpdateAnimator()
 		{
-			if (this.m_IsGrounded && crouch)
-			{
-				if (this.m_Crouching)
-					return;
-				this.m_Capsule.height = this.m_Capsule.height / 2f;
-				this.m_Capsule.center = this.m_Capsule.center / 2f;
-				this.m_Crouching = true;
-			}
-			else
-			{
-				Ray crouchRay = new Ray(this.m_Rigidbody.position + Vector3.up * this.m_Capsule.radius * k_Half, Vector3.up);
-				float crouchRayLength = this.m_CapsuleHeight - m_Capsule.radius * k_Half;
-				if (Physics.SphereCast(crouchRay, this.m_Capsule.radius * k_Half, crouchRayLength, ~0, QueryTriggerInteraction.Ignore))
-				{
-					this.m_Crouching = true;
-					return;
-				}
-				this.m_Capsule.height = m_CapsuleHeight;
-				this.m_Capsule.center = m_CapsuleCenter;
-				this.m_Crouching = false;
-			}
-		}
-
-		void PreventStandingInLowHeadroom()
-		{
-			// prevent standing up in crouch-only zones
-			if (!m_Crouching)
-			{
-				Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-				float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-				if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, ~0, QueryTriggerInteraction.Ignore))
-				{
-					m_Crouching = true;
-				}
-			}
-		}
-
-
-		void UpdateAnimator(Vector3 move)
-		{
+			float amount = this.m_Rigidbody.velocity.x / this.MaxHorizontalSpeed;
 			// update the animator parameters
-			this.m_Animator.SetFloat("Forward", this.m_ForwardAmount, 0.5f, Time.deltaTime);
+			this.m_Animator.SetFloat("Forward", Math.Abs(amount), 0.1f, Time.deltaTime);
 			this.m_Animator.SetFloat("Turn", this.m_TurnAmount, 0.5f, Time.deltaTime);
 			this.m_Animator.SetBool("Crouch", this.m_Crouching);
-			this.m_Animator.SetBool("OnGround", this.m_IsGrounded);
-			if (!this.m_IsGrounded)
+			this.m_Animator.SetBool("OnGround", this._isGrounded);
+			if (!this._isGrounded)
 				this.m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
 
-			// calculate which leg is behind, so as to leave that leg trailing in the jump animation
-			// (This code is reliant on the specific run cycle offset in our animations,
-			// and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
 			float runCycle = Mathf.Repeat(this.m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + this.m_RunCycleLegOffset, 1);
-			float jumpLeg = (runCycle < k_Half ? 1 : -1) * m_ForwardAmount;
-			if (this.m_IsGrounded)
-			{
+			float jumpLeg = (runCycle < k_Half ? 1 : -1) * amount;
+			if (this._isGrounded)
 				this.m_Animator.SetFloat("JumpLeg", jumpLeg);
-			}
 
+			/*
 			// the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
 			// which affects the movement speed because of the root motion.
-			if (this.m_IsGrounded && move.magnitude > 0)
+			if (this._isGrounded && move.magnitude > 0)
 				this.m_Animator.speed = m_AnimSpeedMultiplier;
 			else
 				// don't use that while airborne
 				this.m_Animator.speed = 1;
+			*/
 		}
 
 
 		void HandleAirborneMovement()
 		{
-			Debug.Log("Vixi!");
 			// apply extra gravity from multiplier:
 			Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
 			this.m_Rigidbody.AddForce(extraGravityForce);
@@ -178,7 +165,7 @@ namespace memewars {
 			{
 				// jump!
 				this.m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, m_JumpPower, m_Rigidbody.velocity.z);
-				this.m_IsGrounded = false;
+				this._isGrounded = false;
 				this.m_Animator.applyRootMotion = false;
 				this.m_GroundCheckDistance = 0.1f;
 			}
@@ -196,7 +183,8 @@ namespace memewars {
 		{
 			// we implement this function to override the default root motion.
 			// this allows us to modify the positional speed before it's applied.
-			if (m_IsGrounded && Time.deltaTime > 0)
+			// if (m_IsGrounded && Time.deltaTime > 0)
+			if (_isGrounded && Time.deltaTime > 0)
 			{
 				// Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
 				Vector3 v = (m_Animator.deltaPosition) / Time.deltaTime;
@@ -216,18 +204,10 @@ namespace memewars {
 #endif
 			// 0.1f is a small offset to start the ray from inside the character
 			// it is also good to note that the transform position in the sample assets is at the base of the character
-			if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
-			{
+			if (this.m_Animator.applyRootMotion = this._isGrounded = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
 				this.m_GroundNormal = hitInfo.normal;
-				this.m_IsGrounded = true;
-				this.m_Animator.applyRootMotion = true;
-			}
 			else
-			{
-				this.m_IsGrounded = false;
 				this.m_GroundNormal = Vector3.up;
-				this.m_Animator.applyRootMotion = false;
-			}
 		}
 	}
 }
