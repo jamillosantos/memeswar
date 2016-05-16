@@ -9,7 +9,6 @@ namespace memewars
 	public class StickmanUserControl : MonoBehaviour
 	{
 		private StickmanCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
-		private Transform m_Cam;                  // A reference to the main camera in the scenes transform
 		private Vector3 m_CamForward;             // The current forward direction of the camera
 		private Vector3 m_Move;
 		private bool _jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
@@ -17,17 +16,6 @@ namespace memewars
 
 		private void Start()
 		{
-			// get the transform of the main camera
-			if (Camera.main != null)
-				this.m_Cam = Camera.main.transform;
-			else
-			{
-				Debug.LogWarning(
-					"Warning: no main camera found. Third person character needs a Camera tagged \"MainCamera\", for camera-relative controls.");
-				// we use self-relative controls in this case, which probably isn't what the user wants, but hey, we warned them!
-			}
-
-			// get the third person character ( this should never be null due to require component )
 			this.m_Character = GetComponent<StickmanCharacter>();
 		}
 
@@ -64,7 +52,6 @@ namespace memewars
 			if (Input.GetKey(KeyCode.LeftShift))
 				this.m_Move.x *= 0.5f;
 
-			bool crouch = Input.GetKey(KeyCode.LeftControl);
 			this.m_Character.Move(this.m_Move);
 			this._jump = false;
 		}
