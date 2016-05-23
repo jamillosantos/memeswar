@@ -7,7 +7,7 @@ namespace memewars {
 	[RequireComponent(typeof(Rigidbody))]
 	[RequireComponent(typeof(CapsuleCollider))]
 	[RequireComponent(typeof(Animator))]
-	public class StickmanCharacter : MonoBehaviour
+	public class StickmanCharacter : Photon.MonoBehaviour
 	{
 		public float MaxHorizontalSpeed = 7f;
 
@@ -41,6 +41,11 @@ namespace memewars {
 		private float _jetpackReloadDuration = 5f;
 		private float _jetpackFuel;
 		private float _jetpackReloadRatio;
+		private bool _started = false;
+		private Vector3 _updatedPosition;
+		private Quaternion _updatedRotation;
+		private Vector3 _updatedVelocity;
+		private Bar _jetpackUIBar;
 
 		public bool IsGrounded
 		{
@@ -54,6 +59,8 @@ namespace memewars {
 
 		void Start()
 		{
+			this._jetpackUIBar = GameObject.Find("JetpackBar").GetComponent<Bar>();
+			this._jetpackUIBar.Max = this._jetpackCapacity;
 			this._jetpackFuel = this._jetpackCapacity;
 			this._jetpackReloadRatio = (this._jetpackCapacity / this._jetpackReloadDuration);
 
@@ -67,6 +74,8 @@ namespace memewars {
 			*/
 
 			this._rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
+
+			this._started = true;
 		}
 
 		public void JetPackUpdate()
@@ -77,9 +86,13 @@ namespace memewars {
 				v.y = Math.Min(v.y + 15f * Time.deltaTime, 4f);
 				this._rigidbody.velocity = v;
 				this._jetpackFuel = Math.Max(0f, this._jetpackFuel - Time.deltaTime);
+				this._jetpackUIBar.Current = this._jetpackFuel;
 			}
 			else if (!this.JetPackOn)
+			{
 				this._jetpackFuel = Math.Min(this._jetpackFuel + this._jetpackReloadRatio * Time.deltaTime, this._jetpackCapacity);
+				this._jetpackUIBar.Current = this._jetpackFuel;
+			}
 		}
 
 		public void Jump()
@@ -155,6 +168,40 @@ namespace memewars {
 			else
 				this.m_GroundNormal = Vector3.up;
 			*/
+		}
+
+		void FixedUpdate()
+		{
+			if (!this.photonView.isMine)
+			{
+				// this._rigidbody.transform.position = this._updatedPosition + (this._updatedVelocity * Time.deltaTime);
+				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f) + (this._updatedVelocity * Time.deltaTime);
+				this._rigidbody.transform.rotation = this._updatedRotation;
+				this._rigidbody.velocity = Vector3.Lerp(this._rigidbody.velocity, this._updatedVelocity, 0.1f);
+
+				this.CheckGroundStatus();
+				this.UpdateAnimator();
+			}
+		}
+
+		void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+		{
+			if (this._started)
+			{
+				if (stream.isWriting)
+				{
+					stream.SendNext(this._rigidbody.transform.position);
+					stream.SendNext(this._rigidbody.transform.rotation);
+					stream.SendNext(this._rigidbody.velocity);
+				}
+				else
+				{
+					this._updatedPosition = (Vector3)stream.ReceiveNext();
+					this._updatedRotation = (Quaternion)stream.ReceiveNext();
+					this._updatedVelocity = (Vector3)stream.ReceiveNext();
+				}
+
+			}
 		}
 	}
 }

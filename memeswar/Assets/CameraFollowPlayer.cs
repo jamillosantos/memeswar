@@ -14,12 +14,14 @@ public class CameraFollowPlayer : MonoBehaviour
 	// Use this for initialization
 	void Awake()
 	{
+	/*
 		this.player = GameObject.FindGameObjectWithTag("Player").transform;
 		this.relCameraPos = this.transform.position - player.position;
+	*/
 	}
 
 	void FixedUpdate()
 	{
-		this.transform.position = Vector3.Lerp(this.player.position, this.player.position + this.relCameraPos, this.smooth);
+		// this.transform.position = Vector3.Lerp(this.player.position, this.player.position + this.relCameraPos, this.smooth);
 	}
 }
