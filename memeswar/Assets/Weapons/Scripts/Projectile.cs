@@ -18,29 +18,26 @@ public class Projectile : MonoBehaviour, BasicProjectile
 
 	public float Speed;
 
-	private Rigidbody _rigidbody;
-
-	private Vector3 velocity;
+	public Vector3 Velocity;
 
 	private bool _collided = false;
+	private bool _fired = false;
+
+	public bool Fired
+	{
+		get
+		{
+			return this._fired;
+		}
+	}
 
 	void Start()
-	{
-		this._collided = false;
-		this._rigidbody = this.GetComponent<Rigidbody>();
-	}
-
-	void FixedUpdate()
-	{
-		this._rigidbody.transform.position = this._rigidbody.transform.position + this.velocity * Time.deltaTime;
-
-		if (!this._collided)
-			this._rigidbody.rotation = Quaternion.Euler(0f, 0f, (float)((Math.PI + Math.Atan2(this.velocity.y, this.velocity.x)) * 180f / Math.PI));
-	}
+	{ }
 
 	public void Fire(Vector3 direction)
 	{
-		this.velocity = direction * this.Speed;
+		this.Velocity = direction * this.Speed;
+		this._fired = true;
 	}
 
 	public void OnCollisionEnter(Collision collision)
@@ -48,3 +45,17 @@ public class Projectile : MonoBehaviour, BasicProjectile
 		this._collided = true;
 	}
 }
+
+public class ProjectileTrajectory : MonoBehaviour
+{
+	protected Rigidbody _rigidbody;
+
+	protected Projectile _projectile;
+
+	public virtual void Start()
+	{
+		this._projectile = this.GetComponent<Projectile>();
+		this._rigidbody = this.GetComponent<Rigidbody>();
+	}
+}
+
