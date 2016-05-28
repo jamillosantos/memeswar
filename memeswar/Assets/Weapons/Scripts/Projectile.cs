@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using memewars;
 
 public interface BasicProjectile
 {

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
 using System;
 
-namespace memewars
+namespace Memewars
 {
 	[RequireComponent(typeof(StickmanCharacter))]
 	public class StickmanUserControl : MonoBehaviour
@@ -28,7 +28,7 @@ namespace memewars
 					this._jump = CrossPlatformInputManager.GetButtonDown("Jump");
 			}
 			else
-				this.m_Character.JetPackOn = Input.GetKey(KeyCode.Space);
+				this.m_Character.JetpackOn = Input.GetKey(KeyCode.Space);
 		}
 
 
