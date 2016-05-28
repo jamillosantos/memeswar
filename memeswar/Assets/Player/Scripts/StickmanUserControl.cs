@@ -19,9 +19,10 @@ namespace Memewars
 			this.m_Character = GetComponent<StickmanCharacter>();
 		}
 
-
 		private void Update()
 		{
+			this.InputMouse();
+
 			if (this.m_Character.IsGrounded)
 			{
 				if (!this._jump)
@@ -31,6 +32,32 @@ namespace Memewars
 				this.m_Character.JetpackOn = Input.GetKey(KeyCode.Space);
 		}
 
+		private void InputMouse()
+		{
+			if (this.m_Character.Weapon)
+			{
+				if (Input.GetMouseButton(0))
+				{
+					if (!this.m_Character.Weapon.Trigger1.Pulled)
+						this.m_Character.Weapon.Trigger1.Pull();
+				}
+				else
+				{
+					if (this.m_Character.Weapon.Trigger1.Pulled)
+						this.m_Character.Weapon.Trigger1.Release();
+					if (Input.GetMouseButton(1))
+					{
+						if (!this.m_Character.Weapon.Trigger2.Pulled)
+							this.m_Character.Weapon.Trigger2.Pull();
+
+						if (this.m_Character.Weapon.Trigger2.Pulled)
+							this.m_Character.Weapon.Trigger2.Release();
+						else if (this.m_Character.Weapon.Trigger2.Pulled)
+							this.m_Character.Weapon.Trigger2.Release();
+					}
+				}
+			}
+		}
 
 		// Fixed update is called in sync with physics
 		private void FixedUpdate()
@@ -42,6 +69,10 @@ namespace Memewars
 			bool
 				isRight = Input.GetKey(KeyCode.D),
 				isLeft = Input.GetKey(KeyCode.A);
+
+			if (Input.GetKeyDown(KeyCode.R))
+				this.m_Character.Weapon.StartReloading();
+
 			if (!(isRight && isLeft) && (isRight || isLeft))
 			{
 				if (isRight)

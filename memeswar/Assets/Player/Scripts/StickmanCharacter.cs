@@ -129,8 +129,7 @@ namespace Memewars
 					{
 						this._lastWeaponIndex = this._weaponIndex;
 						this._weaponIndex = value;
-						this._currentWeapon = this.Arsenal[value];
-						this.UpdateWeapon();
+						this.UpdateWeapon(this.Arsenal[value]);
 					}
 					else
 						throw new System.IndexOutOfRangeException("O índice da arma está fora do arsenal.");
@@ -144,10 +143,14 @@ namespace Memewars
 				this.WeaponIndex = this._lastWeaponIndex;
 		}
 
-		protected void UpdateWeapon()
+		protected void UpdateWeapon(Weapon newWeapon)
 		{
-			// TODO: To implement.
-			throw new NotImplementedException();
+			if (this._currentWeapon)
+			{
+				if (this._currentWeapon.IsReloading)
+					this._currentWeapon.StopReloading();
+			}
+			this._currentWeapon = newWeapon;
 		}
 
 
