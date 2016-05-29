@@ -82,7 +82,7 @@ public abstract class Weapon : MonoBehaviour
 	/// <summary>
 	/// Flag re retorna se está em processo de carregamento.
 	/// </summary>
-	public bool Reloading
+	public bool IsReloading
 	{
 		get
 		{

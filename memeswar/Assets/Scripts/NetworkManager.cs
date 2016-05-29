@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using memewars;
+using Memewars;
 
 public class NetworkManager : MonoBehaviour
 {
