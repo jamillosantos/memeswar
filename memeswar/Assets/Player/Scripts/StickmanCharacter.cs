@@ -219,8 +219,7 @@ namespace Memewars
 		/// <param name="move">Parâmetro dos movimentos do jogador.</param>
 		public void Move(Vector3 move)
 		{
-			if (move.x != 0)
-				this._rigidbody.transform.rotation = Quaternion.Euler(0, 90 * (move.x > 0 ? 1f : -1f), 0);
+			this._rigidbody.transform.rotation = Quaternion.Euler(0, 90 * ((this._rigidbody.transform.position.x < Camera.main.ScreenToWorldPoint(Input.mousePosition).x) ? 1f : -1f), 0);
 
 			this.CheckGroundStatus();
 
