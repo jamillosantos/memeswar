@@ -87,6 +87,10 @@ namespace Memewars
 		private Vector3 _updatedVelocity;
 		private Bar _jetpackUIBar;
 
+		private Vector3 AimOffset = Vector3.up * 1.3f;
+
+		private GameObject _aimHandler;
+
 		public bool IsGrounded
 		{
 			get
@@ -164,6 +168,9 @@ namespace Memewars
 			this._animator = this.GetComponent<Animator>();
 			this._rigidbody = this.GetComponent<Rigidbody>();
 
+			this._aimHandler = GameObject.Find("AimTarget");
+			
+
 			/*
 			this.m_Capsule = this.GetComponent<CapsuleCollider>();
 			this.m_CapsuleHeight = this.m_Capsule.height;
@@ -174,6 +181,19 @@ namespace Memewars
 
 			this._started = true;
 			this.UpdateRotation();
+		}
+
+		void Update()
+		{
+			if (this.photonView.isMine)
+			{
+				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
+				Gizmos.color = Color.red;
+				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
+				m.z = 0;
+				m.Normalize();
+				this._aimHandler.transform.position = this.transform.position + (m * 1.3f) + this.AimOffset;
+			}
 		}
 
 		/// <summary>
