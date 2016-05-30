@@ -46,7 +46,7 @@ namespace Memewars
 		Rigidbody _rigidbody;
 		Animator _animator;
 
-		bool _isGrounded;
+		bool _isGrounded = true;
 		
 		float _origGroundCheckDistance;
 		
@@ -86,6 +86,10 @@ namespace Memewars
 		private Quaternion _updatedRotation;
 		private Vector3 _updatedVelocity;
 		private Bar _jetpackUIBar;
+
+		private Vector3 AimOffset = Vector3.up * 1.3f;
+
+		private GameObject _aimHandler;
 
 		public bool IsGrounded
 		{
@@ -164,6 +168,9 @@ namespace Memewars
 			this._animator = this.GetComponent<Animator>();
 			this._rigidbody = this.GetComponent<Rigidbody>();
 
+			this._aimHandler = GameObject.Find("AimTarget");
+			
+
 			/*
 			this.m_Capsule = this.GetComponent<CapsuleCollider>();
 			this.m_CapsuleHeight = this.m_Capsule.height;
@@ -173,6 +180,20 @@ namespace Memewars
 			this._rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
 
 			this._started = true;
+			this.UpdateRotation();
+		}
+
+		void Update()
+		{
+			if (this.photonView.isMine)
+			{
+				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
+				Gizmos.color = Color.red;
+				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
+				m.z = 0;
+				m.Normalize();
+				this._aimHandler.transform.position = this.transform.position + (m * 1.3f) + this.AimOffset;
+			}
 		}
 
 		/// <summary>
@@ -213,21 +234,40 @@ namespace Memewars
 			}
 		}
 
+		protected bool IsFacingRight
+		{
+			get
+			{
+				return (this._rigidbody.transform.position.x < Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
+			}
+		}
+
+		protected void UpdateRotation()
+		{
+			this._rigidbody.rotation = Quaternion.Euler(0, 90 * (this.IsFacingRight ? 1f : -1f), 0);
+		}
+
 		/// <summary>
 		/// Manipula o movimento do jogador.
 		/// </summary>
 		/// <param name="move">Parâmetro dos movimentos do jogador.</param>
 		public void Move(Vector3 move)
 		{
-			this._rigidbody.transform.rotation = Quaternion.Euler(0, 90 * ((this._rigidbody.transform.position.x < Camera.main.ScreenToWorldPoint(Input.mousePosition).x) ? 1f : -1f), 0);
+			this.UpdateRotation();
 
 			this.CheckGroundStatus();
 
 			Vector3 v = this._rigidbody.velocity;
+
 			if (this._isGrounded)
+			{
 				v.x = move.x * this.MaxHorizontalSpeed;
+			}
 			else
-				v.x = Math.Min(Math.Max(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed), this.MaxHorizontalSpeed);
+			{
+				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
+			}
+
 			this._rigidbody.velocity = v;
 
 			this.JetpackUpdate();
@@ -247,7 +287,7 @@ namespace Memewars
 			// this.m_Animator.SetBool("Crouch", this.m_Crouching);
 			this._animator.SetBool("OnGround", this._isGrounded);
 			if (!this._isGrounded)
-				this._animator.SetFloat("Jump", _rigidbody.velocity.y);
+				this._animator.SetFloat("Jump", this._rigidbody.velocity.y);
 
 			float runCycle = Mathf.Repeat(this._animator.GetCurrentAnimatorStateInfo(0).normalizedTime + this._runCycleLegOffset, 1);
 			float jumpLeg = (runCycle < _half ? 1 : -1) * amount;
@@ -275,7 +315,8 @@ namespace Memewars
 			// helper to visualise the ground check ray in the scene view
 			Debug.DrawLine(this.transform.position + (Vector3.up * 0.1f), this.transform.position + (Vector3.up * 0.1f) + (Vector3.down * this._groundCheckDistance));
 #endif
-			this._animator.applyRootMotion = this._isGrounded = Physics.Raycast(this.transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, this._groundCheckDistance);
+			this._isGrounded = Physics.Raycast(this.transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, this._groundCheckDistance);
+
 			/*
 			if (this.m_Animator.applyRootMotion = this._isGrounded = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
 				this.m_GroundNormal = hitInfo.normal;

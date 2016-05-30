@@ -13,7 +13,6 @@ namespace Memewars
 		private Vector3 m_Move;
 		private bool _jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
 
-
 		private void Start()
 		{
 			this.m_Character = GetComponent<StickmanCharacter>();
@@ -63,28 +62,32 @@ namespace Memewars
 		private void FixedUpdate()
 		{
 			if (this._jump)
-				this.m_Character.Jump();
-
-			this.m_Move.x = 0;
-			bool
-				isRight = Input.GetKey(KeyCode.D),
-				isLeft = Input.GetKey(KeyCode.A);
-
-			if (Input.GetKeyDown(KeyCode.R))
-				this.m_Character.Weapon.StartReloading();
-
-			if (!(isRight && isLeft) && (isRight || isLeft))
 			{
-				if (isRight)
-					this.m_Move.x = 1;
-				else if (isLeft)
-					this.m_Move.x = -1;
+				this._jump = false;
+				this.m_Character.Jump();
 			}
-			if (Input.GetKey(KeyCode.LeftShift))
-				this.m_Move.x *= 0.5f;
+			else
+			{
+				this.m_Move.x = 0;
+				bool
+					isRight = Input.GetKey(KeyCode.D),
+					isLeft = Input.GetKey(KeyCode.A);
 
-			this.m_Character.Move(this.m_Move);
-			this._jump = false;
+				if (Input.GetKeyDown(KeyCode.R))
+					this.m_Character.Weapon.StartReloading();
+
+				if (!(isRight && isLeft) && (isRight || isLeft))
+				{
+					if (isRight)
+						this.m_Move.x = 1;
+					else if (isLeft)
+						this.m_Move.x = -1;
+				}
+				if (Input.GetKey(KeyCode.LeftShift))
+					this.m_Move.x *= 0.5f;
+
+				this.m_Character.Move(this.m_Move);
+			}
 		}
 	}
 }
