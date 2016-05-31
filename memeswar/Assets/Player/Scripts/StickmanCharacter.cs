@@ -92,10 +92,24 @@ namespace Memewars
 		private GameObject _aimHandler;
 		private Vector3 _relCameraPos;
 
+		/// <summary>
+		/// Referência do `ParticleSystem` das chamas do jetpack.
+		/// </summary>
 		private ParticleSystem _jetpackFlames;
+
+		/// <summary>
+		/// Referência do `ParticleSystem` da fumaça do jetpack.
+		/// </summary>
 		private ParticleSystem _jetpackSmoke;
+
+		/// <summary>
+		/// Referência da luz do jetpack.
+		/// </summary>
 		private Light _jetpackLight;
 
+		/// <summary>
+		/// Retorna se o jogador está no chão ou não.
+		/// </summary>
 		public bool IsGrounded
 		{
 			get
@@ -104,7 +118,18 @@ namespace Memewars
 			}
 		}
 
+		/// <see cref="JetpackOn" />
 		private bool _jetpackOn = false;
+
+		/// <see cref="AimDirection" />
+		private Vector3 _aimDirection = Vector3.zero;
+
+		private float _aimAngle;
+
+		/// <summary>
+		/// Altura da cabeça do boneco.
+		/// </summary>
+		private readonly float HEAD_HEIGHT = 1.3f;
 
 		/// <summary>
 		/// Variável que define se o Jetpack está ligado ou não.
@@ -166,12 +191,20 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Troca de armas entre as duas recentemente atualizadas.
+		/// </summary>
 		public void ToggleWeapon()
 		{
 			if (this._lastWeaponIndex >= 0)
 				this.WeaponIndex = this._lastWeaponIndex;
 		}
 
+		/// <summary>
+		/// Método chamado para atualização da arma. Ele não é chamado diretamente mas sim pelo setter de `WeaponIndex`.
+		/// </summary>
+		/// <see cref="WeaponIndex"/>
+		/// <param name="newWeapon"></param>
 		protected void UpdateWeapon(Weapon newWeapon)
 		{
 			if (this._currentWeapon)
@@ -216,19 +249,6 @@ namespace Memewars
 
 			this._started = true;
 			this.UpdateRotation();
-		}
-
-		void Update()
-		{
-			if (this.photonView.isMine)
-			{
-				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
-				Gizmos.color = Color.red;
-				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
-				m.z = 0;
-				m.Normalize();
-				this._aimHandler.transform.position = this.transform.position + (m * 1.3f) + this.AimOffset;
-			}
 		}
 
 		/// <summary>
@@ -278,6 +298,31 @@ namespace Memewars
 			get
 			{
 				return (this._rigidbody.transform.position.x < Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
+			}
+		}
+
+		/// <summary>
+		/// Direção para onde a mira está apontando.
+		/// </summary>
+		public Vector3 AimDirection
+		{
+			get
+			{
+				return this._aimDirection;
+			}
+			private set
+			{
+				this._aimDirection = value;
+				this._aimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
+				this._aimAngle = -Mathf.Atan2(this._aimDirection.y, this._aimDirection.x) * Mathf.Rad2Deg;
+			}
+		}
+
+		public float AimAngle
+		{
+			get
+			{
+				return this._aimAngle;
 			}
 		}
 
@@ -355,13 +400,6 @@ namespace Memewars
 			Debug.DrawLine(this.transform.position + (Vector3.up * 0.1f), this.transform.position + (Vector3.up * 0.1f) + (Vector3.down * this._groundCheckDistance));
 #endif
 			this._isGrounded = Physics.Raycast(this.transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, this._groundCheckDistance);
-
-			/*
-			if (this.m_Animator.applyRootMotion = this._isGrounded = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
-				this.m_GroundNormal = hitInfo.normal;
-			else
-				this.m_GroundNormal = Vector3.up;
-			*/
 		}
 
 		/// <summary>
@@ -371,7 +409,14 @@ namespace Memewars
 		{
 			if (this.photonView.isMine)
 			{
+				// TODO: Ajustar de acordo com #36
 				Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, this.transform.position + this._relCameraPos, 0.1f);
+
+				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
+				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
+				m.z = 0;
+				m.Normalize();
+				this.AimDirection = m;
 			}
 			else
 			{
