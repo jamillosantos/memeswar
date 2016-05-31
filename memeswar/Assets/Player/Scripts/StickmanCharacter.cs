@@ -90,6 +90,11 @@ namespace Memewars
 		private Vector3 AimOffset = Vector3.up * 1.3f;
 
 		private GameObject _aimHandler;
+		private Vector3 _relCameraPos;
+
+		private ParticleSystem _jetpackFlames;
+		private ParticleSystem _jetpackSmoke;
+		private Light _jetpackLight;
 
 		public bool IsGrounded
 		{
@@ -99,10 +104,30 @@ namespace Memewars
 			}
 		}
 
+		private bool _jetpackOn = false;
+
 		/// <summary>
 		/// Variável que define se o Jetpack está ligado ou não.
 		/// </summary>
-		public bool JetpackOn { get; set; }
+		public bool JetpackOn
+		{
+			get
+			{
+				return this._jetpackOn;
+			}
+			set
+			{
+				if (this._jetpackOn != value)
+				{
+					this._jetpackOn = value;
+					this._jetpackLight.gameObject.SetActive(value);
+					if (value)
+						this._jetpackFlames.Play(true);
+					else
+						this._jetpackFlames.Stop(true);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Variável que garda a arma atual selecionada. Apenas para facilitar o acesso.
@@ -160,6 +185,16 @@ namespace Memewars
 
 		void Start()
 		{
+			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
+
+			this._jetpackFlames = pSsytems[0];
+			this._jetpackSmoke = pSsytems[1];
+
+			this._jetpackLight = this.GetComponentInChildren<Light>();
+			this._jetpackLight.gameObject.SetActive(false);
+
+			this._relCameraPos = new Vector3(0, 1.3f, -20f);
+
 			this._jetpackUIBar = GameObject.Find("JetpackBar").GetComponent<Bar>();
 			this._jetpackUIBar.Max = this._jetpackCapacity;
 			this._jetpackFuel = this._jetpackCapacity;
@@ -215,6 +250,10 @@ namespace Memewars
 			{
 				this._jetpackFuel = Math.Min(this._jetpackFuel + this._jetpackReloadRatio * Time.deltaTime, this._jetpackCapacity);
 				this._jetpackUIBar.Current = this._jetpackFuel;
+			}
+			else
+			{
+				this.JetpackOn = false;
 			}
 		}
 
@@ -330,7 +369,11 @@ namespace Memewars
 		/// </summary>
 		void FixedUpdate()
 		{
-			if (!this.photonView.isMine)
+			if (this.photonView.isMine)
+			{
+				Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, this.transform.position + this._relCameraPos, 0.1f);
+			}
+			else
 			{
 				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f) + (this._updatedVelocity * Time.deltaTime);
 				this._rigidbody.transform.rotation = this._updatedRotation;
