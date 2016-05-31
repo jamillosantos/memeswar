@@ -10,11 +10,12 @@ namespace Memewars
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
-
 		/// <summary>
 		/// Array que guarda as referências das armas do arsenal.
 		/// </summary>
-		protected Weapon[] Arsenal;
+		protected Weapon[] Arsenal = new Weapon[5];
+
+		private UnityEngine.Object[] ArsenalPrefab = new UnityEngine.Object[5];
 
 		/// <summary>
 		/// </summary>
@@ -92,6 +93,8 @@ namespace Memewars
 		private GameObject _aimHandler;
 		private Vector3 _relCameraPos;
 
+		private Arsenal _arsenalPlaceholder;
+
 		/// <summary>
 		/// Referência do `ParticleSystem` das chamas do jetpack.
 		/// </summary>
@@ -116,6 +119,22 @@ namespace Memewars
 			{
 				return this._isGrounded;
 			}
+		}
+
+		public void SetWeapon(int index, UnityEngine.Object original)
+		{
+			if (this._arsenalPlaceholder)
+			{
+				Debug.Log("Alterando arma");
+				if (this.Arsenal[index])
+					Destroy(this.Arsenal[index]);
+				GameObject go = (GameObject)Instantiate(original);
+				this.Arsenal[index] = go.GetComponent<Weapon>();
+				if (this._arsenalPlaceholder)
+					go.transform.SetParent(this._arsenalPlaceholder.gameObject.transform);
+			}
+			else
+				this.ArsenalPrefab[index] = original;
 		}
 
 		/// <see cref="JetpackOn" />
@@ -219,6 +238,22 @@ namespace Memewars
 		void Start()
 		{
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
+
+			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
+
+			int i = 0;
+			foreach (UnityEngine.Object original in this.ArsenalPrefab)
+			{
+				if (original)
+				{
+					GameObject w = (GameObject)Instantiate(original, Vector3.zero, Quaternion.identity);
+					w.transform.SetParent(this._arsenalPlaceholder.transform, false);
+					// w.transform.position = new Vector3(0, 0, 0);
+					w.transform.rotation = Quaternion.Euler(0, 270, 0);
+					this.Arsenal[i] = w.GetComponent<Weapon>();
+				}
+				i++;
+			}
 
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
@@ -342,7 +377,6 @@ namespace Memewars
 			this.CheckGroundStatus();
 
 			Vector3 v = this._rigidbody.velocity;
-
 			if (this._isGrounded)
 			{
 				v.x = move.x * this.MaxHorizontalSpeed;
@@ -351,7 +385,6 @@ namespace Memewars
 			{
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
-
 			this._rigidbody.velocity = v;
 
 			this.JetpackUpdate();

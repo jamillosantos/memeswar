@@ -44,5 +44,8 @@ public class NetworkManager : MonoBehaviour
 	{
 		GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity, 0);
 		player.GetComponent<StickmanUserControl>().enabled = true;
+		StickmanCharacter c = player.GetComponent<StickmanCharacter>();
+		UnityEngine.Object Ak47 = Resources.Load("Ak47");
+		c.SetWeapon(0, Ak47);
 	}
 }

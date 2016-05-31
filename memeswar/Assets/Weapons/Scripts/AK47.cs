@@ -7,6 +7,8 @@ public class AK47
 
 	public GameObject BulletPrefab;
 
+	public GameObject BulletSpawnPoint;
+
 	public AK47()
 		: base()
 	{
