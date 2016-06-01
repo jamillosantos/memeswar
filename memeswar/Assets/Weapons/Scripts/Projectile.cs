@@ -23,9 +23,16 @@ public class Projectile : MonoBehaviour, BasicProjectile
 	/// </summary>
 	public float Speed;
 
+	/// <summary>
+	/// Flag que guarda se o objeto já sofreu alguma colisão.
+	/// </summary>
 	private bool _collided = false;
 
+	/// <see cref="Fired" />
 	private bool _fired = false;
+
+	/// <see cref="FiredAt" />
+	private float _firedAt = -1;
 
 	private Vector3 _velocity;
 
@@ -51,16 +58,32 @@ public class Projectile : MonoBehaviour, BasicProjectile
 		}
 	}
 
+	/// <summary>
+	/// Momento em que o projétil foi lançado.
+	/// </summary>
+	public float FiredAt
+	{
+		get
+		{
+			return this._firedAt;
+		}
+	}
+
+
 	protected virtual void Start()
+	{ }
+
+	protected virtual void Update()
 	{ }
 
 	public void Fire(Vector3 direction)
 	{
+		this._firedAt = Time.timeSinceLevelLoad;
 		this._velocity = direction * this.Speed;
 		this._fired = true;
 	}
 
-	public void OnCollisionEnter(Collision collision)
+	public virtual void OnCollisionEnter(Collision collision)
 	{
 		this._collided = true;
 	}
