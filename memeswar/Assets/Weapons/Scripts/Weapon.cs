@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Memewars;
 
 /// <summary>
 /// Classe base para as implementações das armas.
 /// </summary>
 public abstract class Weapon : MonoBehaviour
 {
+	private StickmanCharacter _stickmanCharacter;
+
 	private Trigger _trigger1;
 
 	private Trigger _trigger2;
@@ -16,6 +19,19 @@ public abstract class Weapon : MonoBehaviour
 	/// Nome da arma dentro do jogo.
 	/// </summary>
 	public string Name;
+
+	protected virtual void Start()
+	{
+		this._stickmanCharacter = this.GetComponentInParent<StickmanCharacter>();
+	}
+
+	protected StickmanCharacter StickmanCharacter
+	{
+		get
+		{
+			return this._stickmanCharacter;
+		}
+	}
 
 	/// <summary>
 	/// Cria a instância do trigger primário para esta arma.

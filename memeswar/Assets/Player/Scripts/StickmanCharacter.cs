@@ -10,11 +10,12 @@ namespace Memewars
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
-
 		/// <summary>
 		/// Array que guarda as referências das armas do arsenal.
 		/// </summary>
-		protected Weapon[] Arsenal;
+		protected Weapon[] Arsenal = new Weapon[5];
+
+		private UnityEngine.Object[] ArsenalPrefab = new UnityEngine.Object[5];
 
 		/// <summary>
 		/// </summary>
@@ -92,10 +93,26 @@ namespace Memewars
 		private GameObject _aimHandler;
 		private Vector3 _relCameraPos;
 
+		private Arsenal _arsenalPlaceholder;
+
+		/// <summary>
+		/// Referência do `ParticleSystem` das chamas do jetpack.
+		/// </summary>
 		private ParticleSystem _jetpackFlames;
+
+		/// <summary>
+		/// Referência do `ParticleSystem` da fumaça do jetpack.
+		/// </summary>
 		private ParticleSystem _jetpackSmoke;
+
+		/// <summary>
+		/// Referência da luz do jetpack.
+		/// </summary>
 		private Light _jetpackLight;
 
+		/// <summary>
+		/// Retorna se o jogador está no chão ou não.
+		/// </summary>
 		public bool IsGrounded
 		{
 			get
@@ -104,7 +121,33 @@ namespace Memewars
 			}
 		}
 
+		public void SetWeapon(int index, UnityEngine.Object original)
+		{
+			if (this._arsenalPlaceholder)
+			{
+				if (this.Arsenal[index])
+					Destroy(this.Arsenal[index]);
+				GameObject go = (GameObject)Instantiate(original);
+				this.Arsenal[index] = go.GetComponent<Weapon>();
+				if (this._arsenalPlaceholder)
+					go.transform.SetParent(this._arsenalPlaceholder.gameObject.transform);
+			}
+			else
+				this.ArsenalPrefab[index] = original;
+		}
+
+		/// <see cref="JetpackOn" />
 		private bool _jetpackOn = false;
+
+		/// <see cref="AimDirection" />
+		private Vector3 _aimDirection = Vector3.zero;
+
+		private float _aimAngle;
+
+		/// <summary>
+		/// Altura da cabeça do boneco.
+		/// </summary>
+		private readonly float HEAD_HEIGHT = 1.3f;
 
 		/// <summary>
 		/// Variável que define se o Jetpack está ligado ou não.
@@ -166,26 +209,54 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Troca de armas entre as duas recentemente atualizadas.
+		/// </summary>
 		public void ToggleWeapon()
 		{
 			if (this._lastWeaponIndex >= 0)
 				this.WeaponIndex = this._lastWeaponIndex;
 		}
 
+		/// <summary>
+		/// Método chamado para atualização da arma. Ele não é chamado diretamente mas sim pelo setter de `WeaponIndex`.
+		/// </summary>
+		/// <see cref="WeaponIndex"/>
+		/// <param name="newWeapon"></param>
 		protected void UpdateWeapon(Weapon newWeapon)
 		{
 			if (this._currentWeapon)
 			{
 				if (this._currentWeapon.IsReloading)
 					this._currentWeapon.StopReloading();
+				this._currentWeapon.gameObject.SetActive(false);
 			}
 			this._currentWeapon = newWeapon;
+			newWeapon.gameObject.SetActive(true);
 		}
 
 
 		void Start()
 		{
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
+
+			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
+
+			int i = 0;
+			foreach (UnityEngine.Object original in this.ArsenalPrefab)
+			{
+				if (original)
+				{
+					GameObject w = (GameObject)Instantiate(original, Vector3.zero, Quaternion.identity);
+					w.transform.SetParent(this._arsenalPlaceholder.transform, false);
+					// w.transform.position = new Vector3(0, 0, 0);
+					w.transform.rotation = Quaternion.Euler(0, 270, 0);
+					this.Arsenal[i] = w.GetComponent<Weapon>();
+					this.Arsenal[i].gameObject.SetActive(false);
+				}
+				i++;
+			}
+			this.WeaponIndex = 0;
 
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
@@ -216,19 +287,6 @@ namespace Memewars
 
 			this._started = true;
 			this.UpdateRotation();
-		}
-
-		void Update()
-		{
-			if (this.photonView.isMine)
-			{
-				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
-				Gizmos.color = Color.red;
-				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
-				m.z = 0;
-				m.Normalize();
-				this._aimHandler.transform.position = this.transform.position + (m * 1.3f) + this.AimOffset;
-			}
 		}
 
 		/// <summary>
@@ -281,6 +339,31 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Direção para onde a mira está apontando.
+		/// </summary>
+		public Vector3 AimDirection
+		{
+			get
+			{
+				return this._aimDirection;
+			}
+			private set
+			{
+				this._aimDirection = value;
+				this._aimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
+				this._aimAngle = -Mathf.Atan2(this._aimDirection.y, this._aimDirection.x) * Mathf.Rad2Deg;
+			}
+		}
+
+		public float AimAngle
+		{
+			get
+			{
+				return this._aimAngle;
+			}
+		}
+
 		protected void UpdateRotation()
 		{
 			this._rigidbody.rotation = Quaternion.Euler(0, 90 * (this.IsFacingRight ? 1f : -1f), 0);
@@ -297,7 +380,6 @@ namespace Memewars
 			this.CheckGroundStatus();
 
 			Vector3 v = this._rigidbody.velocity;
-
 			if (this._isGrounded)
 			{
 				v.x = move.x * this.MaxHorizontalSpeed;
@@ -306,7 +388,6 @@ namespace Memewars
 			{
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
-
 			this._rigidbody.velocity = v;
 
 			this.JetpackUpdate();
@@ -355,13 +436,6 @@ namespace Memewars
 			Debug.DrawLine(this.transform.position + (Vector3.up * 0.1f), this.transform.position + (Vector3.up * 0.1f) + (Vector3.down * this._groundCheckDistance));
 #endif
 			this._isGrounded = Physics.Raycast(this.transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, this._groundCheckDistance);
-
-			/*
-			if (this.m_Animator.applyRootMotion = this._isGrounded = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
-				this.m_GroundNormal = hitInfo.normal;
-			else
-				this.m_GroundNormal = Vector3.up;
-			*/
 		}
 
 		/// <summary>
@@ -371,7 +445,14 @@ namespace Memewars
 		{
 			if (this.photonView.isMine)
 			{
+				// TODO: Ajustar de acordo com #36
 				Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, this.transform.position + this._relCameraPos, 0.1f);
+
+				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
+				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
+				m.z = 0;
+				m.Normalize();
+				this.AimDirection = m;
 			}
 			else
 			{

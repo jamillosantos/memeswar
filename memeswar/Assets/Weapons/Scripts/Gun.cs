@@ -53,6 +53,22 @@ public class Gun : Weapon
 		return new GunTrigger();
 	}
 
+	protected GunTrigger GunTrigger1
+	{
+		get
+		{
+			return (GunTrigger)this.Trigger1;
+		}
+	}
+
+	protected GunTrigger GunTrigger2
+	{
+		get
+		{
+			return (GunTrigger)this.Trigger2;
+		}
+	}
+
 	/// <summary>
 	/// Decrementa a arma para o Trigger1.
 	/// </summary>
