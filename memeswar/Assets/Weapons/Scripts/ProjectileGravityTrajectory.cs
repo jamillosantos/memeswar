@@ -5,7 +5,7 @@ public class ProjectileGravityTrajectory : ProjectileTrajectory
 {
 	bool _initialized = false;
 
-	public override void Start()
+	protected override void Start()
 	{
 		base.Start();
 		this._rigidbody.useGravity = true;

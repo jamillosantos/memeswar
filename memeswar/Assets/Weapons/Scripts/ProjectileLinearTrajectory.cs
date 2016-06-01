@@ -3,9 +3,9 @@ using System.Collections;
 
 public class ProjectileLinearTrajectory : ProjectileTrajectory
 {
-	bool _rotated = false;
+	private bool _initialized = false;
 
-	public override void Start()
+	protected override void Start()
 	{
 		base.Start();
 		this._rigidbody.useGravity = false;
@@ -15,12 +15,13 @@ public class ProjectileLinearTrajectory : ProjectileTrajectory
 	{
 		if (this._projectile.Fired)
 		{
-			if (!this._rotated)
+			if (!this._initialized)
 			{
 				this._rigidbody.velocity = this._projectile.Velocity;
-				this._rotated = true;
+				this._initialized = true;
 			}
 			this._rigidbody.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(this._rigidbody.velocity.y, this._rigidbody.velocity.x) * Mathf.Rad2Deg);
 		}
+		Debug.Log(Time.timeSinceLevelLoad + ": " + this._rigidbody.velocity);
 	}
 }

@@ -1,4 +1,5 @@
 ﻿
+using Memewars;
 using UnityEngine;
 
 public class AK47
@@ -18,6 +19,7 @@ public class AK47
 
 	protected override void CreateProjectile1()
 	{
-		Instantiate(this.BulletPrefab, Vector3.zero, Quaternion.identity);
+		GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, Vector3.zero, Quaternion.identity);
+		bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter.AimDirection);
 	}
 }

@@ -125,7 +125,6 @@ namespace Memewars
 		{
 			if (this._arsenalPlaceholder)
 			{
-				Debug.Log("Alterando arma");
 				if (this.Arsenal[index])
 					Destroy(this.Arsenal[index]);
 				GameObject go = (GameObject)Instantiate(original);
@@ -230,8 +229,10 @@ namespace Memewars
 			{
 				if (this._currentWeapon.IsReloading)
 					this._currentWeapon.StopReloading();
+				this._currentWeapon.gameObject.SetActive(false);
 			}
 			this._currentWeapon = newWeapon;
+			newWeapon.gameObject.SetActive(true);
 		}
 
 
@@ -251,9 +252,11 @@ namespace Memewars
 					// w.transform.position = new Vector3(0, 0, 0);
 					w.transform.rotation = Quaternion.Euler(0, 270, 0);
 					this.Arsenal[i] = w.GetComponent<Weapon>();
+					this.Arsenal[i].gameObject.SetActive(false);
 				}
 				i++;
 			}
+			this.WeaponIndex = 0;
 
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
