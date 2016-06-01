@@ -22,6 +22,5 @@ public class ProjectileLinearTrajectory : ProjectileTrajectory
 			}
 			this._rigidbody.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(this._rigidbody.velocity.y, this._rigidbody.velocity.x) * Mathf.Rad2Deg);
 		}
-		Debug.Log(Time.timeSinceLevelLoad + ": " + this._rigidbody.velocity);
 	}
 }

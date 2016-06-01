@@ -57,7 +57,6 @@ public class Projectile : MonoBehaviour, BasicProjectile
 	public void Fire(Vector3 direction)
 	{
 		this._velocity = direction * this.Speed;
-		Debug.Log(this._velocity);
 		this._fired = true;
 	}
 
