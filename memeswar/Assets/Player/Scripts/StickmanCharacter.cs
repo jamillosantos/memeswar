@@ -253,10 +253,14 @@ namespace Memewars
 					w.transform.rotation = Quaternion.Euler(0, 270, 0);
 					this.Arsenal[i] = w.GetComponent<Weapon>();
 					this.Arsenal[i].gameObject.SetActive(false);
+					//
+					if (i == 0)
+						this.WeaponIndex = 0;
 				}
 				i++;
 			}
-			this.WeaponIndex = 0;
+			// FiXME
+			// this.WeaponIndex = 0;
 
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
@@ -488,6 +492,11 @@ namespace Memewars
 				}
 
 			}
+		}
+
+		public virtual void Die()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

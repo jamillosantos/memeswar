@@ -23,20 +23,16 @@ public class NetworkManager : MonoBehaviour
 
 	void OnJoinedLobby()
 	{
-		Debug.Log("OnJoinedLobby");
 		PhotonNetwork.JoinRandomRoom();
 	}
 
 	void OnPhotonRandomJoinFailed()
 	{
-		Debug.Log("OnPhotonRandomJoinFailed");
 		PhotonNetwork.CreateRoom("Sangria desatada");
 	}
 
 	void OnJoinedRoom()
 	{
-		Debug.Log("OnJoinedRoom");
-
 		this.CreateMyPlayer();
 	}
 
