@@ -57,6 +57,21 @@ public class Projectile : MonoBehaviour
 		}
 	}
 
+	/// <see cref="DefaultRenderer"/>
+	private Renderer _defaultRenderer;
+
+	/// <summary>
+	/// Referência padrão para o renderer do projétil.
+	/// </summary>
+	public Renderer DefaultRenderer
+	{
+		get
+		{
+			return this._defaultRenderer;
+		}
+	}
+
+
 	/// <summary>
 	/// Velocidade vetorial do objeto.
 	/// </summary>
@@ -94,7 +109,7 @@ public class Projectile : MonoBehaviour
 	protected virtual void Start()
 	{
 		this._defaultCollider = this.GetComponent<Collider>();
-		// this._defaultCollider.isTrigger = true;
+		this._defaultRenderer = this.GetComponent<Renderer>();
 	}
 
 	protected virtual void Update()

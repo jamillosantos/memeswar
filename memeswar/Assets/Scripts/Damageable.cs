@@ -36,6 +36,7 @@ public class Damageable : MonoBehaviour
 	/// <see cref="Die" />
 	public void Damage(float damage)
 	{
+		Debug.Log("Ouchh!! " + this._currentHP + " - " + damage);
 		this._currentHP -= damage;
 		if (this._currentHP <= 0)
 			this.Die();

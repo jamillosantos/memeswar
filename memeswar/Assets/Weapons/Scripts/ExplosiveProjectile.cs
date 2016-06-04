@@ -5,15 +5,6 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// Estados do projétil explosivo.
-/// </summary>
-enum ExplosiveProjectileState
-{
-	Default,
-	WaitingExplosionCollider
-}
-
-/// <summary>
 /// Classe que implementa a abstração de um projétil que gera uma explosão ao final. A implementação
 /// dá-se ao primeiro contato do projétil que ao invés de aplicar um dano a um `Damageable` (como
 /// na implementação padrão), este gera uma `SphereCollider` e aguarda uma nova colisão (mais um tick
@@ -32,54 +23,39 @@ public class ExplosiveProjectile : Projectile
 	public float CoreRadius = 0f;
 
 	/// <summary>
-	/// Para
-	/// </summary>
-	private ExplosiveProjectileState _state;
-
-	public ExplosiveProjectile() : base()
-	{
-		this._state = ExplosiveProjectileState.Default;
-	}
-
-	/// <summary>
 	/// Cria o novo collider com o tamanho do raio da explosão.
 	/// </summary>
 	/// <param name="collision"></param>
 	protected override void Hit(Collision collision)
 	{
-		if (this._state == ExplosiveProjectileState.Default)
+		/// Desabilita colisor padrão
+		this.DefaultCollider.enabled = false;
+
+		/// Cria colisor esférico para simular a área da explosão.
+		SphereCollider collider = this.gameObject.AddComponent<SphereCollider>();
+		collider.radius = this.Radius;
+			
+		/// Desabilita o renderer para que o projétil não seja mais exibido.
+		this.DefaultRenderer.enabled = false;
+
+		/// Colliders atingidos na área da explosão.
+		Collider[] colliders = Physics.OverlapSphere(this.transform.position, this.Radius);
+
+		/// Vê o ponto mais próximo do objeto na explosão e usa esse dado para computar a distância
+		/// para assim aplicar o dano.
+		Vector3 contactPoint;
+		float d;
+		Damageable damageable;
+		foreach (Collider c in colliders)
 		{
-			/// Desabilita colisor padrão
-			this.DefaultCollider.enabled = false;
-
-			/// Cria colisor esférico para simular a área da explosão.
-			SphereCollider collider = this.gameObject.AddComponent<SphereCollider>();
-			collider.radius = this.Radius;
-			collider.isTrigger = true;
-
-			/// ALtera o estado para que próxima colisão aplique o dano, ao contrário de
-			/// criar novamente uma área de explosão.
-			this._state = ExplosiveProjectileState.WaitingExplosionCollider;
+			damageable = c.GetComponent<Damageable>();
+			if (damageable)
+			{
+				contactPoint = c.ClosestPointOnBounds(this.transform.position);
+				d = Vector3.Distance(contactPoint, this.transform.position);
+				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))));
+			}
 		}
-		else
-			base.Hit(collision);
-	}
-
-	/// <summary>
-	/// Calcula o dano proporcional da explosão de acordo com a distância. 
-	/// </summary>
-	/// <param name="contact">Ponto de contato do colisor.</param>
-	/// <param name="damageable">Objeto que deve sofrer o dano.</param>
-	protected override void ApplyDamage(ContactPoint contact, Damageable damageable)
-	{
-		/// Calcula distância
-		float d = Vector3.Distance(contact.point, this.gameObject.transform.position);
-		
-		/// Se na área de dano máximo.
-		if (d <= this.CoreRadius)
-			damageable.Damage(this.Damage);
-		else
-			/// Calcula o dano proporcional a distância. O dano é arredondado para cima, para não ser possível um caso de dano 0.
-			damageable.Damage(Mathf.Ceil(this.Damage * ((d - this.CoreRadius) / this.Radius)));
+		Destroy(this.gameObject);
 	}
 }
