@@ -155,13 +155,24 @@ public class Gun : Weapon
 	/// </summary>
 	public virtual void Update()
 	{
-		if (this.CanFire((GunTrigger)this.Trigger1))
+		if (this.IsReloading)
 		{
-			this.Fire1();
+			if (this.ReloadingElapsed >= this.ReloadTime)
+			{
+				this.Ammo = Mathf.Min(this.Ammo + this.ReloadAmount, this.CartridgeSize);
+				this.StopReloading();
+			}
 		}
-		else if (this.CanFire((GunTrigger)this.Trigger2))
+		else
 		{
-			this.Fire2();
+			if (this.CanFire((GunTrigger)this.Trigger1))
+			{
+				this.Fire1();
+			}
+			else if (this.CanFire((GunTrigger)this.Trigger2))
+			{
+				this.Fire2();
+			}
 		}
 	}
 
