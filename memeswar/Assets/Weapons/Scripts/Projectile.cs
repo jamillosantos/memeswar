@@ -158,6 +158,9 @@ public class Projectile : MonoBehaviour
 		Debug.Log("Recreasing " + this.Damage + " from " + damageable.CurrentHP);
 		damageable.Damage(this.Damage);
 	}
+
+	protected virtual void OnDestroy()
+	{ }
 }
 
 /// <summary>

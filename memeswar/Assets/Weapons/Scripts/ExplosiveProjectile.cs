@@ -18,6 +18,11 @@ public class ExplosiveProjectile : Projectile
 	public float Radius = 1f;
 
 	/// <summary>
+	/// Efeito da explosão quando o obeto é destruído.
+	/// </summary>
+	public GameObject ExplosionEffect;
+
+	/// <summary>
 	/// Núcleo da explosão que terá dano máximo
 	/// </summary>
 	public float CoreRadius = 0f;
@@ -56,6 +61,8 @@ public class ExplosiveProjectile : Projectile
 				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))));
 			}
 		}
+		if (this.ExplosionEffect)
+			Instantiate(this.ExplosionEffect, this.transform.position, Quaternion.identity);
 		Destroy(this.gameObject);
 	}
 }
