@@ -86,7 +86,9 @@ namespace Memewars
 		private Vector3 _updatedPosition;
 		private Quaternion _updatedRotation;
 		private Vector3 _updatedVelocity;
+
 		private Bar _jetpackUIBar;
+		private Bar _ammoUIBar;
 
 		private Vector3 AimOffset = Vector3.up * 1.3f;
 
@@ -202,6 +204,8 @@ namespace Memewars
 						this._lastWeaponIndex = this._weaponIndex;
 						this._weaponIndex = value;
 						this.UpdateWeapon(this.Arsenal[value]);
+						if (this.Weapon is Gun)
+							this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
 					}
 					else
 						throw new System.IndexOutOfRangeException("O índice da arma está fora do arsenal.");
@@ -216,6 +220,26 @@ namespace Memewars
 		{
 			if (this._lastWeaponIndex >= 0)
 				this.WeaponIndex = this._lastWeaponIndex;
+		}
+
+		void Update()
+		{
+			if (this.photonView.isMine)
+			{
+				if (this.Weapon.IsReloading)
+				{
+					if (this.Weapon is Gun)
+					{
+						Gun g = (Gun)this.Weapon;
+						this._ammoUIBar.Current = g.Ammo + (g.ReloadAmount * (g.ReloadingElapsed / g.ReloadTime));
+					}
+				}
+				else
+				{
+					if (this.Weapon is Gun)
+						this._ammoUIBar.Current = ((Gun)this.Weapon).Ammo;
+				}
+			}
 		}
 
 		/// <summary>
@@ -241,6 +265,15 @@ namespace Memewars
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
 
 			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
+
+
+			if (this.photonView.isMine)
+			{
+				this._jetpackUIBar = GameObject.Find("JetpackBar").GetComponent<Bar>();
+				this._jetpackUIBar.Max = this._jetpackCapacity;
+
+				this._ammoUIBar = GameObject.Find("AmmoBar").GetComponent<Bar>();
+			}
 
 			int i = 0;
 			foreach (UnityEngine.Object original in this.ArsenalPrefab)
@@ -270,8 +303,6 @@ namespace Memewars
 
 			this._relCameraPos = new Vector3(0, 1.3f, -20f);
 
-			this._jetpackUIBar = GameObject.Find("JetpackBar").GetComponent<Bar>();
-			this._jetpackUIBar.Max = this._jetpackCapacity;
 			this._jetpackFuel = this._jetpackCapacity;
 			this._jetpackReloadRatio = (this._jetpackCapacity / this._jetpackReloadDuration);
 
@@ -306,12 +337,14 @@ namespace Memewars
 				v.y = Math.Min(v.y + 15f * Time.deltaTime, 4f);
 				this._rigidbody.velocity = v;
 				this._jetpackFuel = Math.Max(0f, this._jetpackFuel - Time.deltaTime);
-				this._jetpackUIBar.Current = this._jetpackFuel;
+				if (this.photonView.isMine)
+					this._jetpackUIBar.Current = this._jetpackFuel;
 			}
 			else if (!this.JetpackOn)
 			{
 				this._jetpackFuel = Math.Min(this._jetpackFuel + this._jetpackReloadRatio * Time.deltaTime, this._jetpackCapacity);
-				this._jetpackUIBar.Current = this._jetpackFuel;
+				if (this.photonView.isMine)
+					this._jetpackUIBar.Current = this._jetpackFuel;
 			}
 			else
 			{

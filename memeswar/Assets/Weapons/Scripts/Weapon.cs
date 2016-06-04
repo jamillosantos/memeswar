@@ -20,6 +20,28 @@ public abstract class Weapon : MonoBehaviour
 	/// </summary>
 	public string Name;
 
+	/// <see cref="ReloadingStartedAt"/>
+	private float _reloadingStartedAt;
+
+	/// <summary>
+	/// Momento em que o processo de recarregamento foi iniciado.
+	/// </summary>
+	public float ReloadingStartedAt
+	{
+		get
+		{
+			return this._reloadingStartedAt;
+		}
+	}
+
+	public float ReloadingElapsed
+	{
+		get
+		{
+			return (Time.time - this._reloadingStartedAt);
+		}
+	}
+
 	protected virtual void Start()
 	{
 		this._stickmanCharacter = this.GetComponentInParent<StickmanCharacter>();
@@ -85,6 +107,7 @@ public abstract class Weapon : MonoBehaviour
 	public virtual void StartReloading()
 	{
 		this._reloading = true;
+		this._reloadingStartedAt = Time.time;
 	}
 
 	/// <summary>
