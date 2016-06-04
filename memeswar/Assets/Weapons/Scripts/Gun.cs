@@ -26,10 +26,19 @@ public class Gun : Weapon
 	/// </summary>
 	public float ReloadAmount;
 
+	/// <see cref="LastShotAt" />
+	public float _lastShotAt;
+
 	/// <summary>
 	/// Momento em que o último tiro foi disparado.
 	/// </summary>
-	public float LastShotAt;
+	public float LastShotAt
+	{
+		get
+		{
+			return this._lastShotAt;
+		}
+	}
 
 	/// <summary>
 	/// Quantos segundos se passaram a partir do último tiro dado. Esta variável será atualizada quando o processo
@@ -39,9 +48,25 @@ public class Gun : Weapon
 	{
 		get
 		{
-			return (Time.time - this.LastShotAt);
+			return (Time.time - this._lastShotAt);
 		}
 	}
+
+	/// <summary>
+	/// Prefab do projétil que será disparado.
+	/// </summary>
+	public GameObject BulletPrefab;
+
+	/// <summary>
+	/// Spawn point do projétil.
+	/// </summary>
+	public GameObject BulletSpawnPoint;
+
+	/// <summary>
+	/// Sistema de partículas que será acionado no momento do tiro.
+	/// </summary>
+	public ParticleSystem MuzzleParticleSystem;
+
 
 	protected override Trigger CreateTrigger1()
 	{
@@ -90,7 +115,9 @@ public class Gun : Weapon
 	/// </summary>
 	protected virtual void CreateProjectile1()
 	{
-		// TODO Implement this
+		GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, this.BulletSpawnPoint.transform.position, Quaternion.identity);
+		bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter.AimDirection);
+		this.MuzzleParticleSystem.Play();
 	}
 
 	/// <summary>
@@ -107,7 +134,7 @@ public class Gun : Weapon
 	protected virtual void Fire1()
 	{
 		Debug.Log("Fire");
-		this.LastShotAt = Time.time;
+		this._lastShotAt = Time.time;
 		this.DecreaseAmmo1();
 		this.CreateProjectile1();
 	}
@@ -118,7 +145,7 @@ public class Gun : Weapon
 	protected virtual void Fire2()
 	{
 		Debug.Log("Fire2");
-		this.LastShotAt = Time.time;
+		this._lastShotAt = Time.time;
 		this.DecreaseAmmo2();
 		this.CreateProjectile2();
 	}

@@ -17,9 +17,9 @@ public class AK47Projectile : Projectile
 			Destroy(this.gameObject);
 	}
 
-	public override void OnCollisionEnter(Collision collision)
+	protected override void Hit(Collision collision)
 	{
-		base.OnCollisionEnter(collision);
+		base.Hit(collision);
 		/// Inicializa o efeito de hit.
 		/// O próprio collisionFX deverá se auto-destruir.
 		Instantiate(this.CollisionFX, collision.contacts[0].point, Quaternion.identity);

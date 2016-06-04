@@ -2,7 +2,7 @@
 using System.Collections;
 using Memewars;
 
-public class Ak47Visual : MonoBehaviour
+public class SpriteWeaponVisual : MonoBehaviour
 {
 	private SpriteRenderer _sprite;
 	private StickmanCharacter _stickmanCharacter;
