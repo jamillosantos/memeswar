@@ -320,8 +320,8 @@ namespace Memewars
 
 			this._rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
 
-			this._started = true;
 			this.UpdateRotation();
+			this._started = true;
 		}
 
 		/// <summary>
@@ -434,17 +434,23 @@ namespace Memewars
 
 		/// <summary>
 		/// Atualiza a animação do jogo.
+		/// 
+		/// Método baseado na implementação padrão do controlador de jogador de terceira pessoa do Unity.
 		/// </summary>
 		void UpdateAnimator()
 		{
-			float amount = this._rigidbody.velocity.x / this.MaxHorizontalSpeed;
-			// update the animator parameters
+			float amount = ((this.photonView.isMine) ? this._rigidbody.velocity.x : this._updatedVelocity.x ) / this.MaxHorizontalSpeed;
 			this._animator.SetFloat("Forward", Math.Abs(amount), 0.1f, Time.deltaTime);
 			// this.m_Animator.SetFloat("Turn", this.m_TurnAmount, 0.5f, Time.deltaTime);
 			// this.m_Animator.SetBool("Crouch", this.m_Crouching);
 			this._animator.SetBool("OnGround", this._isGrounded);
 			if (!this._isGrounded)
-				this._animator.SetFloat("Jump", this._rigidbody.velocity.y);
+			{
+				if (this.photonView.isMine)
+					this._animator.SetFloat("Jump", this._rigidbody.velocity.y);
+				else
+					this._animator.SetFloat("Jump", Mathf.Lerp(this._rigidbody.velocity.y, this._updatedVelocity.y, 0.2f));
+			}
 
 			float runCycle = Mathf.Repeat(this._animator.GetCurrentAnimatorStateInfo(0).normalizedTime + this._runCycleLegOffset, 1);
 			float jumpLeg = (runCycle < _half ? 1 : -1) * amount;
@@ -493,9 +499,13 @@ namespace Memewars
 			}
 			else
 			{
-				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f) + (this._updatedVelocity * Time.deltaTime);
+				//this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f);
+				float
+					d = Vector3.Distance(this._rigidbody.transform.position, this._updatedPosition),
+					maxDistance = 1f;
+				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f + Mathf.Min(0.4f, d/maxDistance));
 				this._rigidbody.transform.rotation = this._updatedRotation;
-				this._rigidbody.velocity = Vector3.Lerp(this._rigidbody.velocity, this._updatedVelocity, 0.1f);
+				this._rigidbody.velocity = this._updatedVelocity;
 
 				this.CheckGroundStatus();
 				this.UpdateAnimator();
@@ -516,14 +526,15 @@ namespace Memewars
 					stream.SendNext(this._rigidbody.transform.position);
 					stream.SendNext(this._rigidbody.transform.rotation);
 					stream.SendNext(this._rigidbody.velocity);
+					stream.SendNext(this._aimDirection);
 				}
 				else
 				{
 					this._updatedPosition = (Vector3)stream.ReceiveNext();
 					this._updatedRotation = (Quaternion)stream.ReceiveNext();
 					this._updatedVelocity = (Vector3)stream.ReceiveNext();
+					this.AimDirection = (Vector3)stream.ReceiveNext();
 				}
-
 			}
 		}
 
