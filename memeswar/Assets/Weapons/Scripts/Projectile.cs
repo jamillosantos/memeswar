@@ -105,6 +105,10 @@ public class Projectile : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Resource que vai ser instanciado quando houver o hit.
+	/// </summary>
+	public GameObject CollisionFX;
 
 	protected virtual void Start()
 	{
@@ -146,6 +150,8 @@ public class Projectile : MonoBehaviour
 			if (damageable)
 				 this.ApplyDamage(contact, damageable);
 		}
+		Instantiate(this.CollisionFX, collision.contacts[0].point, Quaternion.identity);
+		Destroy(this.gameObject);
 	}
 
 	/// <summary>

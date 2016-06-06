@@ -4,5 +4,5 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public class AK47Projectile : Projectile
+public class ShotgunProjectile : Projectile
 { }
