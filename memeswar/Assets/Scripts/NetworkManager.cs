@@ -42,8 +42,8 @@ public class NetworkManager : MonoBehaviour
 		player.GetComponent<StickmanUserControl>().enabled = true;
 
 		StickmanCharacter c = player.GetComponent<StickmanCharacter>();
-		c.SetWeapon(0, Weapon.Weapons.AK47);
-		c.SetWeapon(1, Weapon.Weapons.RocketLauncher);
-		c.SetWeapon(2, Weapon.Weapons.Shotgun);
+		c.SetArsenal(new Weapon.Weapons[] {
+			Weapon.Weapons.AK47, Weapon.Weapons.RocketLauncher, Weapon.Weapons.Shotgun, Weapon.Weapons.AK47, Weapon.Weapons.AK47
+		});
 	}
 }
