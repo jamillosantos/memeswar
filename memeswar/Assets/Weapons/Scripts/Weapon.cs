@@ -7,6 +7,14 @@ using Memewars;
 /// </summary>
 public abstract class Weapon : MonoBehaviour
 {
+
+	public enum Weapons
+	{
+		AK47,
+		Shotgun,
+		RocketLauncher
+	}
+
 	private StickmanCharacter _stickmanCharacter;
 
 	private Trigger _trigger1;

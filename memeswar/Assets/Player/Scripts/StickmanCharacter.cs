@@ -86,13 +86,15 @@ namespace Memewars
 		private Vector3 _updatedPosition;
 		private Quaternion _updatedRotation;
 		private Vector3 _updatedVelocity;
+		private Vector3 _updatedAimDirection;
 
 		private Bar _jetpackUIBar;
 		private Bar _ammoUIBar;
 
 		private Vector3 AimOffset = Vector3.up * 1.3f;
 
-		private GameObject _aimHandler;
+		public GameObject AimHandler;
+
 		private Vector3 _relCameraPos;
 
 		private Arsenal _arsenalPlaceholder;
@@ -123,8 +125,25 @@ namespace Memewars
 			}
 		}
 
-		public void SetWeapon(int index, UnityEngine.Object original)
+		[PunRPC]
+		public void SetWeapon(int index, Weapon.Weapons weapon)
 		{
+			string d;
+			switch (weapon)
+			{
+				case Weapon.Weapons.AK47:
+					d = "AK47";
+					break;
+				case Weapon.Weapons.RocketLauncher:
+					d = "RocketLauncher";
+					break;
+				case Weapon.Weapons.Shotgun:
+					d = "Shotgun";
+					break;
+				default:
+					throw new NotImplementedException("Armna não definida!");
+			}
+			UnityEngine.Object original = Resources.Load(d);
 			if (this._arsenalPlaceholder)
 			{
 				if (this.Arsenal[index])
@@ -136,6 +155,9 @@ namespace Memewars
 			}
 			else
 				this.ArsenalPrefab[index] = original;
+			
+			if (this.photonView.isMine)
+				this.photonView.RPC("SetWeapon", PhotonTargets.Others, index, weapon);
 		}
 
 		/// <see cref="JetpackOn" />
@@ -208,7 +230,7 @@ namespace Memewars
 							this._lastWeaponIndex = this._weaponIndex;
 							this._weaponIndex = value;
 							this.UpdateWeapon(this.Arsenal[value]);
-							if (this.Weapon is Gun)
+							if ((this._ammoUIBar) && (this.Weapon) && (this.Weapon is Gun))
 								this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
 						}
 					}
@@ -314,9 +336,6 @@ namespace Memewars
 			this._animator = this.GetComponent<Animator>();
 			this._rigidbody = this.GetComponent<Rigidbody>();
 
-			this._aimHandler = GameObject.Find("AimTarget");
-			
-
 			/*
 			this.m_Capsule = this.GetComponent<CapsuleCollider>();
 			this.m_CapsuleHeight = this.m_Capsule.height;
@@ -393,7 +412,7 @@ namespace Memewars
 			private set
 			{
 				this._aimDirection = value;
-				this._aimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
+				this.AimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
 				this._aimAngle = -Mathf.Atan2(this._aimDirection.y, this._aimDirection.x) * Mathf.Rad2Deg;
 			}
 		}
@@ -511,6 +530,7 @@ namespace Memewars
 				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f + Mathf.Min(0.4f, d/maxDistance));
 				this._rigidbody.transform.rotation = this._updatedRotation;
 				this._rigidbody.velocity = this._updatedVelocity;
+				this.AimDirection = Vector3.Lerp(this.AimDirection, this._updatedAimDirection, 0.2f);
 
 				this.CheckGroundStatus();
 				this.UpdateAnimator();
@@ -538,7 +558,7 @@ namespace Memewars
 					this._updatedPosition = (Vector3)stream.ReceiveNext();
 					this._updatedRotation = (Quaternion)stream.ReceiveNext();
 					this._updatedVelocity = (Vector3)stream.ReceiveNext();
-					this.AimDirection = (Vector3)stream.ReceiveNext();
+					this._updatedAimDirection = (Vector3)stream.ReceiveNext();
 				}
 			}
 		}
