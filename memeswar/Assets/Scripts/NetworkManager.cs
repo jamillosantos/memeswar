@@ -41,7 +41,7 @@ public class NetworkManager : MonoBehaviour
 		GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity, 0);
 		player.GetComponent<StickmanUserControl>().enabled = true;
 		StickmanCharacter c = player.GetComponent<StickmanCharacter>();
-		UnityEngine.Object rocketLauncher = Resources.Load("RocketLauncher");
+		UnityEngine.Object rocketLauncher = Resources.Load("Shotgun");
 		c.SetWeapon(0, rocketLauncher);
 		/*
 		UnityEngine.Object Ak47 = Resources.Load("Ak47");
