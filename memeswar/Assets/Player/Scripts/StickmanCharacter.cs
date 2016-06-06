@@ -201,11 +201,16 @@ namespace Memewars
 				{
 					if ((value >= 0) && (value < this.Arsenal.Length))
 					{
-						this._lastWeaponIndex = this._weaponIndex;
-						this._weaponIndex = value;
-						this.UpdateWeapon(this.Arsenal[value]);
-						if (this.Weapon is Gun)
-							this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
+						if (this.Arsenal[value] == null)
+							Debug.Log("Arma não setada.");
+						else
+						{
+							this._lastWeaponIndex = this._weaponIndex;
+							this._weaponIndex = value;
+							this.UpdateWeapon(this.Arsenal[value]);
+							if (this.Weapon is Gun)
+								this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
+						}
 					}
 					else
 						throw new System.IndexOutOfRangeException("O índice da arma está fora do arsenal.");
