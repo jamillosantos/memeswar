@@ -532,10 +532,7 @@ namespace Memewars
 			else
 			{
 				//this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f);
-				float
-					d = Vector3.Distance(this._rigidbody.transform.position, this._updatedPosition),
-					maxDistance = 1f;
-				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f + Mathf.Min(0.4f, d/maxDistance));
+				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, Time.deltaTime * 5f);
 				this._rigidbody.transform.rotation = this._updatedRotation;
 				this._rigidbody.velocity = this._updatedVelocity;
 				this.AimDirection = Vector3.Lerp(this.AimDirection, this._updatedAimDirection, Time.deltaTime * 5f);
