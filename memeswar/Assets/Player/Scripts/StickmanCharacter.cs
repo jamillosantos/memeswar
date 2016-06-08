@@ -15,7 +15,12 @@ namespace Memewars
 		/// </summary>
 		protected Weapon[] Arsenal = new Weapon[5];
 
-		private UnityEngine.Object[] ArsenalPrefab = new UnityEngine.Object[5];
+		/// <summary>
+		/// Mantém os tipos das armas que serão utilizados no arsenal.
+		/// </summary>
+		private Weapon.Weapons[] ArsenalType = new Weapon.Weapons[5] {
+			Weapon.Weapons.AK47, Weapon.Weapons.AK47, Weapon.Weapons.AK47, Weapon.Weapons.AK47, Weapon.Weapons.AK47
+		};
 
 		/// <summary>
 		/// </summary>
@@ -86,13 +91,15 @@ namespace Memewars
 		private Vector3 _updatedPosition;
 		private Quaternion _updatedRotation;
 		private Vector3 _updatedVelocity;
+		private Vector3 _updatedAimDirection;
 
 		private Bar _jetpackUIBar;
 		private Bar _ammoUIBar;
 
 		private Vector3 AimOffset = Vector3.up * 1.3f;
 
-		private GameObject _aimHandler;
+		public GameObject AimHandler;
+
 		private Vector3 _relCameraPos;
 
 		private Arsenal _arsenalPlaceholder;
@@ -123,19 +130,56 @@ namespace Memewars
 			}
 		}
 
-		public void SetWeapon(int index, UnityEngine.Object original)
+		[PunRPC]
+		public void SetArsenal(Weapon.Weapons[] arsenal)
+		{
+			Debug.Log(Time.timeSinceLevelLoad + ": SetArsenal " + this.photonView.isMine);
+			if (!this.photonView.isMine)
+			{
+				foreach (Weapon.Weapons w in arsenal)
+					Debug.Log(Time.timeSinceLevelLoad + ": SetArsenal " + w);
+			}
+			this.ArsenalType = arsenal;
+
+			int i = 0;
+			foreach (Weapon.Weapons w in arsenal)
+			{
+				this.ReplaceWeapon(i, w);
+				i++;
+			}
+
+			if (this.photonView.isMine && this._started)
+				this.photonView.RPC("SetArsenal", PhotonTargets.Others, arsenal);
+		}
+
+		void OnPhotonInstantiate(PhotonMessageInfo info)
+		{
+			Debug.Log("Instantiate " + this.photonView.isMine);
+			if (this.photonView.isMine)
+			{
+				Debug.Log("Enviando dados!");
+				this.photonView.RPC("SetArsenal", PhotonTargets.Others, this.ArsenalType);
+			}
+		}
+
+		[PunRPC]
+		public void ReplaceWeapon(int index, Weapon.Weapons weapon)
 		{
 			if (this._arsenalPlaceholder)
 			{
+				UnityEngine.Object original = Resources.Load(weapon.ToString());
 				if (this.Arsenal[index])
 					Destroy(this.Arsenal[index]);
-				GameObject go = (GameObject)Instantiate(original);
+				GameObject go = (GameObject)Instantiate(original, Vector3.zero, Quaternion.Euler(0, -90, 0));
 				this.Arsenal[index] = go.GetComponent<Weapon>();
-				if (this._arsenalPlaceholder)
-					go.transform.SetParent(this._arsenalPlaceholder.gameObject.transform);
+				go.transform.SetParent(this._arsenalPlaceholder.gameObject.transform, false);
+				go.SetActive(false);
 			}
 			else
-				this.ArsenalPrefab[index] = original;
+				this.ArsenalType[index] = weapon;
+			
+			if (this.photonView.isMine)
+				this.photonView.RPC("ReplaceWeapon", PhotonTargets.Others, index, weapon);
 		}
 
 		/// <see cref="JetpackOn" />
@@ -202,20 +246,26 @@ namespace Memewars
 					if ((value >= 0) && (value < this.Arsenal.Length))
 					{
 						if (this.Arsenal[value] == null)
-							Debug.Log("Arma não setada.");
-						else
-						{
-							this._lastWeaponIndex = this._weaponIndex;
-							this._weaponIndex = value;
-							this.UpdateWeapon(this.Arsenal[value]);
-							if (this.Weapon is Gun)
-								this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
-						}
+							this.ReplaceWeapon(value, this.ArsenalType[value]);
+
+						this._lastWeaponIndex = this._weaponIndex;
+						this._weaponIndex = value;
+						this.UpdateWeapon(this.Arsenal[value]);
+						if ((this._ammoUIBar) && (this.Weapon) && (this.Weapon is Gun))
+							this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
 					}
 					else
 						throw new System.IndexOutOfRangeException("O índice da arma está fora do arsenal.");
 				}
+				if (this.photonView.isMine)
+					this.photonView.RPC("SetWeaponIndex", PhotonTargets.Others, value);
 			}
+		}
+
+		[PunRPC]
+		public void SetWeaponIndex(int value)
+		{
+			this.WeaponIndex = value;
 		}
 
 		/// <summary>
@@ -231,17 +281,17 @@ namespace Memewars
 		{
 			if (this.photonView.isMine)
 			{
-				if (this.Weapon.IsReloading)
+				if (this.Weapon)
 				{
-					if (this.Weapon is Gun)
+					if (this.Weapon.IsReloading)
 					{
-						Gun g = (Gun)this.Weapon;
-						this._ammoUIBar.Current = g.Ammo + (g.ReloadAmount * (g.ReloadingElapsed / g.ReloadTime));
+						if (this.Weapon is Gun)
+						{
+							Gun g = (Gun)this.Weapon;
+							this._ammoUIBar.Current = g.Ammo + (g.ReloadAmount * (g.ReloadingElapsed / g.ReloadTime));
+						}
 					}
-				}
-				else
-				{
-					if (this.Weapon is Gun)
+					else if (this.Weapon is Gun)
 						this._ammoUIBar.Current = ((Gun)this.Weapon).Ammo;
 				}
 			}
@@ -262,6 +312,7 @@ namespace Memewars
 			}
 			this._currentWeapon = newWeapon;
 			newWeapon.gameObject.SetActive(true);
+			Debug.Log(Time.timeSinceLevelLoad + ": UpdateWeapon " + newWeapon.gameObject.name);
 		}
 
 
@@ -271,7 +322,6 @@ namespace Memewars
 
 			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
 
-
 			if (this.photonView.isMine)
 			{
 				this._jetpackUIBar = GameObject.Find("JetpackBar").GetComponent<Bar>();
@@ -279,26 +329,6 @@ namespace Memewars
 
 				this._ammoUIBar = GameObject.Find("AmmoBar").GetComponent<Bar>();
 			}
-
-			int i = 0;
-			foreach (UnityEngine.Object original in this.ArsenalPrefab)
-			{
-				if (original)
-				{
-					GameObject w = (GameObject)Instantiate(original, Vector3.zero, Quaternion.identity);
-					w.transform.SetParent(this._arsenalPlaceholder.transform, false);
-					// w.transform.position = new Vector3(0, 0, 0);
-					w.transform.rotation = Quaternion.Euler(0, 270, 0);
-					this.Arsenal[i] = w.GetComponent<Weapon>();
-					this.Arsenal[i].gameObject.SetActive(false);
-					//
-					if (i == 0)
-						this.WeaponIndex = 0;
-				}
-				i++;
-			}
-			// FiXME
-			// this.WeaponIndex = 0;
 
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
@@ -313,9 +343,6 @@ namespace Memewars
 
 			this._animator = this.GetComponent<Animator>();
 			this._rigidbody = this.GetComponent<Rigidbody>();
-
-			this._aimHandler = GameObject.Find("AimTarget");
-			
 
 			/*
 			this.m_Capsule = this.GetComponent<CapsuleCollider>();
@@ -393,7 +420,7 @@ namespace Memewars
 			private set
 			{
 				this._aimDirection = value;
-				this._aimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
+				this.AimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
 				this._aimAngle = -Mathf.Atan2(this._aimDirection.y, this._aimDirection.x) * Mathf.Rad2Deg;
 			}
 		}
@@ -511,9 +538,10 @@ namespace Memewars
 				this._rigidbody.transform.position = Vector3.Lerp(this._rigidbody.transform.position, this._updatedPosition, 0.1f + Mathf.Min(0.4f, d/maxDistance));
 				this._rigidbody.transform.rotation = this._updatedRotation;
 				this._rigidbody.velocity = this._updatedVelocity;
+				this.AimDirection = Vector3.Lerp(this.AimDirection, this._updatedAimDirection, 0.2f);
 
 				this.CheckGroundStatus();
-				this.UpdateAnimator();
+				// this.UpdateAnimator();
 			}
 		}
 
@@ -538,7 +566,7 @@ namespace Memewars
 					this._updatedPosition = (Vector3)stream.ReceiveNext();
 					this._updatedRotation = (Quaternion)stream.ReceiveNext();
 					this._updatedVelocity = (Vector3)stream.ReceiveNext();
-					this.AimDirection = (Vector3)stream.ReceiveNext();
+					this._updatedAimDirection = (Vector3)stream.ReceiveNext();
 				}
 			}
 		}

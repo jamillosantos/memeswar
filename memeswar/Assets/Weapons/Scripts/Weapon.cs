@@ -1,12 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Memewars;
+using System.ComponentModel;
 
 /// <summary>
 /// Classe base para as implementações das armas.
 /// </summary>
 public abstract class Weapon : MonoBehaviour
 {
+
+	public enum Weapons
+	{
+		[Description("AK47")]
+		AK47,
+
+		[Description("Shotgun")]
+		Shotgun,
+		
+		[Description("RocketLauncher")]
+		RocketLauncher
+	}
+
 	private StickmanCharacter _stickmanCharacter;
 
 	private Trigger _trigger1;

@@ -7,6 +7,7 @@ public class NetworkManager : MonoBehaviour
 {
 	void Start ()
 	{
+		Debug.Log("PhotonNetwork.sendRate: " + PhotonNetwork.sendRate);
 		this.Connect();
 	}
 
@@ -40,9 +41,10 @@ public class NetworkManager : MonoBehaviour
 	{
 		GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity, 0);
 		player.GetComponent<StickmanUserControl>().enabled = true;
+
 		StickmanCharacter c = player.GetComponent<StickmanCharacter>();
-		c.SetWeapon(0, Resources.Load("RocketLauncher"));
-		c.SetWeapon(1, Resources.Load("Ak47"));
-		c.SetWeapon(2, Resources.Load("Shotgun"));
+		c.SetArsenal(new Weapon.Weapons[] {
+			Weapon.Weapons.AK47, Weapon.Weapons.RocketLauncher, Weapon.Weapons.Shotgun, Weapon.Weapons.AK47, Weapon.Weapons.AK47
+		});
 	}
 }
