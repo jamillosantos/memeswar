@@ -130,8 +130,10 @@ namespace Memewars
 			}
 		}
 
+		[PunRPC]
 		public void SetArsenal(Weapon.Weapons[] arsenal)
 		{
+			Debug.Log("SetArsenal" + arsenal);
 			if (this._arsenalPlaceholder)
 			{
 				/// Destruindo todas as armas existentes.
@@ -160,6 +162,13 @@ namespace Memewars
 			{
 				this.ArsenalType = arsenal;
 			}
+			if (this.photonView.isMine)
+				this.photonView.RPC("SetArsenal", PhotonTargets.Others, arsenal);
+		}
+
+		void OnPhotonInstantiate(PhotonMessageInfo info)
+		{
+			//
 		}
 
 		[PunRPC]
@@ -321,6 +330,7 @@ namespace Memewars
 			}
 			this._currentWeapon = newWeapon;
 			newWeapon.gameObject.SetActive(true);
+			Debug.Log(Time.timeSinceLevelLoad + ": UpdateWeapon " + newWeapon.gameObject.name);
 		}
 
 
