@@ -7,6 +7,7 @@ public class NetworkManager : MonoBehaviour
 {
 	void Start ()
 	{
+		Debug.Log("PhotonNetwork.sendRate: " + PhotonNetwork.sendRate);
 		this.Connect();
 	}
 

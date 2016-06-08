@@ -133,67 +133,53 @@ namespace Memewars
 		[PunRPC]
 		public void SetArsenal(Weapon.Weapons[] arsenal)
 		{
-			Debug.Log("SetArsenal" + arsenal);
-			if (this._arsenalPlaceholder)
+			Debug.Log(Time.timeSinceLevelLoad + ": SetArsenal " + this.photonView.isMine);
+			if (!this.photonView.isMine)
 			{
-				/// Destruindo todas as armas existentes.
-				int i;
-				for (i = 0; i < this.Arsenal.Length; i++)
-				{
-					Weapon w = this.Arsenal[i];
-					if (w)
-					{
-						Destroy(w);
-						this.Arsenal[i] = null;
-					}
-				}
-
-				/// Alterando os tipos
-				this.ArsenalType = arsenal;
-
-				i = 0;
 				foreach (Weapon.Weapons w in arsenal)
-				{
-					this.SetWeapon(i, w);
-					i++;
-				}
+					Debug.Log(Time.timeSinceLevelLoad + ": SetArsenal " + w);
 			}
-			else
+			this.ArsenalType = arsenal;
+
+			int i = 0;
+			foreach (Weapon.Weapons w in arsenal)
 			{
-				this.ArsenalType = arsenal;
+				this.ReplaceWeapon(i, w);
+				i++;
 			}
-			if (this.photonView.isMine)
+
+			if (this.photonView.isMine && this._started)
 				this.photonView.RPC("SetArsenal", PhotonTargets.Others, arsenal);
 		}
 
 		void OnPhotonInstantiate(PhotonMessageInfo info)
 		{
-			//
+			Debug.Log("Instantiate " + this.photonView.isMine);
+			if (this.photonView.isMine)
+			{
+				Debug.Log("Enviando dados!");
+				this.photonView.RPC("SetArsenal", PhotonTargets.Others, this.ArsenalType);
+			}
 		}
 
 		[PunRPC]
-		public void SetWeapon(int index, Weapon.Weapons weapon)
+		public void ReplaceWeapon(int index, Weapon.Weapons weapon)
 		{
-			Debug.Log(Time.timeSinceLevelLoad + ": SetWeapon " + index + " " + weapon);
 			if (this._arsenalPlaceholder)
 			{
-				Debug.Log(Time.timeSinceLevelLoad + ": arsenalPlaceholder");
 				UnityEngine.Object original = Resources.Load(weapon.ToString());
 				if (this.Arsenal[index])
 					Destroy(this.Arsenal[index]);
-				GameObject go = (GameObject)Instantiate(original, this.transform.position, Quaternion.Euler(0, -90, 0));
+				GameObject go = (GameObject)Instantiate(original, Vector3.zero, Quaternion.Euler(0, -90, 0));
 				this.Arsenal[index] = go.GetComponent<Weapon>();
 				go.transform.SetParent(this._arsenalPlaceholder.gameObject.transform, false);
 				go.SetActive(false);
 			}
 			else
-			{
-				Debug.Log(Time.timeSinceLevelLoad + ": !arsenalPlaceholder " + index + " = " + weapon);
 				this.ArsenalType[index] = weapon;
-			}
 			
 			if (this.photonView.isMine)
-				this.photonView.RPC("SetWeapon", PhotonTargets.Others, index, weapon);
+				this.photonView.RPC("ReplaceWeapon", PhotonTargets.Others, index, weapon);
 		}
 
 		/// <see cref="JetpackOn" />
@@ -255,21 +241,18 @@ namespace Memewars
 
 			set
 			{
-				Debug.Log(Time.timeSinceLevelLoad + ": WeaponIndex set " + value);
 				if (value != this._weaponIndex)
 				{
 					if ((value >= 0) && (value < this.Arsenal.Length))
 					{
 						if (this.Arsenal[value] == null)
-							Debug.Log("Arma não setada.");
-						else
-						{
-							this._lastWeaponIndex = this._weaponIndex;
-							this._weaponIndex = value;
-							this.UpdateWeapon(this.Arsenal[value]);
-							if ((this._ammoUIBar) && (this.Weapon) && (this.Weapon is Gun))
-								this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
-						}
+							this.ReplaceWeapon(value, this.ArsenalType[value]);
+
+						this._lastWeaponIndex = this._weaponIndex;
+						this._weaponIndex = value;
+						this.UpdateWeapon(this.Arsenal[value]);
+						if ((this._ammoUIBar) && (this.Weapon) && (this.Weapon is Gun))
+							this._ammoUIBar.Max = ((Gun)this.Weapon).CartridgeSize;
 					}
 					else
 						throw new System.IndexOutOfRangeException("O índice da arma está fora do arsenal.");
@@ -282,7 +265,6 @@ namespace Memewars
 		[PunRPC]
 		public void SetWeaponIndex(int value)
 		{
-			Debug.Log(Time.timeSinceLevelLoad + ": SetWeaponIndex" + value);
 			this.WeaponIndex = value;
 		}
 
@@ -347,8 +329,6 @@ namespace Memewars
 
 				this._ammoUIBar = GameObject.Find("AmmoBar").GetComponent<Bar>();
 			}
-
-			this.SetArsenal(this.ArsenalType);
 
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
@@ -561,7 +541,7 @@ namespace Memewars
 				this.AimDirection = Vector3.Lerp(this.AimDirection, this._updatedAimDirection, 0.2f);
 
 				this.CheckGroundStatus();
-				this.UpdateAnimator();
+				// this.UpdateAnimator();
 			}
 		}
 
