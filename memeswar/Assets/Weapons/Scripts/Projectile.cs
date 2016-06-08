@@ -9,7 +9,8 @@
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
-public class Projectile : MonoBehaviour
+[RequireComponent(typeof(PhotonView))]
+public class Projectile : Photon.MonoBehaviour
 {
 	/// <summary>
 	/// Dano infligido caso acerte um jogador.
@@ -119,11 +120,14 @@ public class Projectile : MonoBehaviour
 	protected virtual void Update()
 	{ }
 
+	[PunRPC]
 	public void Fire(Vector3 direction)
 	{
 		this._firedAt = Time.timeSinceLevelLoad;
 		this._velocity = direction * this.Speed;
 		this._fired = true;
+		if (this.photonView.isMine)
+			this.photonView.RPC("Fire", PhotonTargets.Others, direction);
 	}
 
 	/// <summary>

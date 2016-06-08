@@ -115,7 +115,7 @@ public class Gun : Weapon
 	/// </summary>
 	protected virtual void CreateProjectile1()
 	{
-		GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, this.BulletSpawnPoint.transform.position, Quaternion.identity);
+		GameObject bullet = (GameObject)PhotonNetwork.Instantiate(this.BulletPrefab.name, this.BulletSpawnPoint.transform.position, Quaternion.identity, 0);
 		bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter.AimDirection);
 		this.MuzzleParticleSystem.Play();
 	}
