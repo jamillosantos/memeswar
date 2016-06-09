@@ -18,7 +18,7 @@ public class Shotgun
 		GameObject bullet;
 		for (int i = 0; i < 4; i++)
 		{
-			bullet = (GameObject)Instantiate(this.BulletPrefab, this.BulletSpawnPoint.transform.position, Quaternion.identity);
+			bullet = (GameObject)PhotonNetwork.Instantiate(this.BulletPrefab.name	, this.BulletSpawnPoint.transform.position, Quaternion.identity, 0);
 			bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter.AimDirection + new Vector3(Random.Range(-0.07f, 0.07f), Random.Range(-0.07f, 0.07f)));
 		}
 		this.MuzzleParticleSystem.Play();
