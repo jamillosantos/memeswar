@@ -155,7 +155,7 @@ public class Projectile : Photon.MonoBehaviour
 				 this.ApplyDamage(contact, damageable);
 		}
 		Instantiate(this.CollisionFX, collision.contacts[0].point, Quaternion.identity);
-		Destroy(this.gameObject);
+		PhotonNetwork.Destroy(this.gameObject);
 	}
 
 	/// <summary>
