@@ -167,9 +167,9 @@ namespace Memewars
 		{
 			if (this._arsenalPlaceholder)
 			{
-				UnityEngine.Object original = Resources.Load(weapon.ToString());
 				if (this.Arsenal[index])
-					Destroy(this.Arsenal[index]);
+					PhotonNetwork.Destroy(this.Arsenal[index].gameObject);
+				UnityEngine.Object original = Resources.Load(weapon.ToString());
 				GameObject go = (GameObject)Instantiate(original, Vector3.zero, Quaternion.Euler(0, -90, 0));
 				this.Arsenal[index] = go.GetComponent<Weapon>();
 				go.transform.SetParent(this._arsenalPlaceholder.gameObject.transform, false);
@@ -275,6 +275,14 @@ namespace Memewars
 		{
 			if (this._lastWeaponIndex >= 0)
 				this.WeaponIndex = this._lastWeaponIndex;
+		}
+
+		public void VisualFireEffect()
+		{
+			if (this.Weapon)
+			{
+				this.Weapon.VisualFireEffect();
+			}
 		}
 
 		void Update()
@@ -571,6 +579,15 @@ namespace Memewars
 		public virtual void Die()
 		{
 			throw new NotImplementedException();
+		}
+
+		[PunRPC]
+		public void CreateProjectile1(int[] networkIds, Vector3[] directions, Vector3[] positions)
+		{
+			if (this.Weapon is Gun)
+			{
+				((Gun)this.Weapon).CreateProjectile1(networkIds, directions, positions);
+			}
 		}
 	}
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shotgun
 	: Gun
 {
+	private const int FRAGMENTS = 4;
 
 	public Shotgun()
 		: base()
@@ -13,14 +14,18 @@ public class Shotgun
 		this.GunTrigger2.TimeBetweenShots = 0.4f;
 	}
 
-	protected override void CreateProjectile1()
+	protected override void TriggerCreateProjectile1()
 	{
-		GameObject bullet;
-		for (int i = 0; i < 4; i++)
+		int[] networkIds = new int[FRAGMENTS];
+		Vector3[] directions = new Vector3[FRAGMENTS];
+		Vector3[] positions = new Vector3[FRAGMENTS];
+		for (int i = 0; i < FRAGMENTS; i++)
 		{
-			bullet = (GameObject)PhotonNetwork.Instantiate(this.BulletPrefab.name	, this.BulletSpawnPoint.transform.position, Quaternion.identity, 0);
-			bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter.AimDirection + new Vector3(Random.Range(-0.07f, 0.07f), Random.Range(-0.07f, 0.07f)));
+			networkIds[i] = PhotonNetwork.AllocateViewID();
+			directions[i] = this.StickmanCharacter.AimDirection + new Vector3(Random.Range(-0.07f, 0.07f), Random.Range(-0.07f, 0.07f));
+			positions[i] = this.BulletSpawnPoint.transform.position;
 		}
-		this.MuzzleParticleSystem.Play();
+		this.CreateProjectile1(networkIds, directions, positions);
+		this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
 	}
 }

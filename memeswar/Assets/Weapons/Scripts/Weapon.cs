@@ -2,6 +2,7 @@
 using System.Collections;
 using Memewars;
 using System.ComponentModel;
+using System;
 
 /// <summary>
 /// Classe base para as implementações das armas.
@@ -142,4 +143,7 @@ public abstract class Weapon : MonoBehaviour
 			return this._reloading;
 		}
 	}
+
+	public virtual void VisualFireEffect()
+	{ }
 }
