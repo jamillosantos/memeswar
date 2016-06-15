@@ -113,19 +113,23 @@ public class Gun : Weapon
 	/// <summary>
 	/// Cria os projéteis que serão disparados para o Trigger1.
 	/// </summary>
-	protected virtual void CreateProjectile1()
+	public virtual void CreateProjectile1(int[] networkIds, Vector3[] directions, Vector3[] positions)
 	{
-		GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, this.BulletSpawnPoint.transform.position, Quaternion.identity);
-		bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter.AimDirection);
-		this.MuzzleParticleSystem.Play();
+		this.VisualFireEffect();
+		for (uint i = 0; i < networkIds.Length; i++)
+		{
+			GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, positions[i], Quaternion.identity);
+			bullet.GetComponent<PhotonView>().viewID = networkIds[i];
+			bullet.GetComponent<Projectile>().Fire(directions[i]);
+		}
 	}
 
 	/// <summary>
 	/// Cria os projéteis que serão disparados para o Trigger2.
 	/// </summary>
-	protected virtual void CreateProjectile2()
+	protected virtual void CreateProjectile2(Vector3 direction, Vector3 position)
 	{
-		// TODO Implement this
+		/// TODO Implement this
 	}
 
 	/// <summary>
@@ -133,10 +137,18 @@ public class Gun : Weapon
 	/// </summary>
 	protected virtual void Fire1()
 	{
-		Debug.Log("Fire");
 		this._lastShotAt = Time.time;
 		this.DecreaseAmmo1();
-		this.CreateProjectile1();
+		this.TriggerCreateProjectile1();
+	}
+
+	protected virtual void TriggerCreateProjectile1()
+	{
+		int[] networkIds = new int[] { PhotonNetwork.AllocateViewID() };
+		Vector3[] directions = new Vector3[] { this.StickmanCharacter.AimDirection };
+		Vector3[] positions = new Vector3[] { this.BulletSpawnPoint.transform.position };
+		this.CreateProjectile1(networkIds, directions, positions);
+		this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
 	}
 
 	/// <summary>
@@ -147,7 +159,7 @@ public class Gun : Weapon
 		Debug.Log("Fire2");
 		this._lastShotAt = Time.time;
 		this.DecreaseAmmo2();
-		this.CreateProjectile2();
+		this.CreateProjectile2(this.StickmanCharacter.AimDirection, this.BulletSpawnPoint.transform.position);
 	}
 
 	/// <summary>
@@ -189,5 +201,10 @@ public class Gun : Weapon
 			&& (this.Ammo > 0)                                         // Munição disponível
 			&& (trigger.PulledElapsed >= trigger.TimePrepareFirstShot)	// Tempo de preparação já ocorrido
 			&& (this.LastShotElapsed >= trigger.TimeBetweenShots);      // Entre o último tiro e este já passou tempo suficiente
+	}
+
+	public override void VisualFireEffect()
+	{
+		this.MuzzleParticleSystem.Play();
 	}
 }

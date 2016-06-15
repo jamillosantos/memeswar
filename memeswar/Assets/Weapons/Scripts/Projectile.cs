@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Classe que implementa o comportamento básico de um projétil (movimentação inicial, colisões
@@ -9,7 +10,8 @@
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
-public class Projectile : MonoBehaviour
+[RequireComponent(typeof(PhotonView))]
+public class Projectile : Photon.MonoBehaviour
 {
 	/// <summary>
 	/// Dano infligido caso acerte um jogador.
@@ -112,8 +114,11 @@ public class Projectile : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		this._defaultCollider = this.GetComponent<Collider>();
 		this._defaultRenderer = this.GetComponent<Renderer>();
+		Collider[] colliders = this.GetComponents<Collider>();
+		foreach (Collider c in colliders)
+			c.enabled = this.photonView.isMine;
+		this._defaultCollider = colliders[0];
 	}
 
 	protected virtual void Update()
@@ -143,15 +148,24 @@ public class Projectile : MonoBehaviour
 	/// <param name="collision">Objeto que contém todos os dados da colisão.</param>
 	protected virtual void Hit(Collision collision)
 	{
-		Damageable damageable;
-		foreach (ContactPoint contact in collision.contacts)
+		if (this.photonView.isMine)
 		{
-			damageable = contact.otherCollider.GetComponent<Damageable>();
-			if (damageable)
-				 this.ApplyDamage(contact, damageable);
+			Damageable damageable;
+			foreach (ContactPoint contact in collision.contacts)
+			{
+				damageable = contact.otherCollider.GetComponent<Damageable>();
+				if (damageable)
+					 this.ApplyDamage(contact, damageable);
+			}
+			this.DestroyVisualEffect(collision.contacts[0].point);
+			this.photonView.RPC("DestroyProjectile", PhotonTargets.Others, collision.contacts[0].point);
+			Destroy(this.gameObject);
 		}
-		Instantiate(this.CollisionFX, collision.contacts[0].point, Quaternion.identity);
-		Destroy(this.gameObject);
+	}
+
+	private void DestroyVisualEffect(Vector3 point)
+	{
+		Instantiate(this.CollisionFX, point, Quaternion.identity);
 	}
 
 	/// <summary>
@@ -167,6 +181,13 @@ public class Projectile : MonoBehaviour
 
 	protected virtual void OnDestroy()
 	{ }
+
+	[PunRPC]
+	protected virtual void DestroyProjectile(Vector3 point)
+	{
+		this.DestroyVisualEffect(point);
+		Destroy(this.gameObject);
+	}
 }
 
 /// <summary>
