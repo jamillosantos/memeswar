@@ -17,6 +17,8 @@ public class WorldBoundBox : MonoBehaviour
 
 	public float Height = 1f;
 
+	public float Depth = 1f;
+
 	void Start()
 	{
 		this._walls = new BoxCollider[COUNT];
@@ -30,19 +32,18 @@ public class WorldBoundBox : MonoBehaviour
 		if (this._walls != null)
 		{
 			this._walls[TOP].center = new Vector3(0f, -this.Height / 2f, 0f);
-			this._walls[TOP].size = new Vector3(this.Width, 1f, 1f);
+			this._walls[TOP].size = new Vector3(this.Width, 1f, this.Depth);
 		
 			this._walls[RIGHT].center = new Vector3(this.Width / 2f, 0f, 0f);
-			this._walls[RIGHT].size = new Vector3(1f, this.Height, 1f);
+			this._walls[RIGHT].size = new Vector3(1f, this.Height, this.Depth);
 		
 			this._walls[BOTTOM].center = new Vector3(0f, this.Height / 2f, 0f);
-			this._walls[BOTTOM].size = new Vector3(this.Width, 1f, 1f);
+			this._walls[BOTTOM].size = new Vector3(this.Width, 1f, this.Depth);
 		
 			this._walls[LEFT].center = new Vector3(-this.Width / 2f, 0f, 0f);
-			this._walls[LEFT].size = new Vector3(1f, this.Height, 1f);
+			this._walls[LEFT].size = new Vector3(1f, this.Height, this.Depth);
 		}
 	}
-
 
 	void OnDrawGizmos()
 	{
@@ -58,9 +59,9 @@ public class WorldBoundBox : MonoBehaviour
 
 	private void drawGizmos()
 	{
-		Gizmos.DrawCube(this.transform.position + new Vector3(0f, -this.Height / 2f, 0f), new Vector3(this.Width, 1f, 1f));
-		Gizmos.DrawCube(this.transform.position + new Vector3(this.Width / 2f, 0f, 0f), new Vector3(1f, this.Height, 1f));
-		Gizmos.DrawCube(this.transform.position + new Vector3(0f, this.Height / 2f, 0f), new Vector3(this.Width, 1f, 1f));
-		Gizmos.DrawCube(this.transform.position + new Vector3(-this.Width / 2f, 0f, 0f), new Vector3(1f, this.Height, 1f));
+		Gizmos.DrawCube(this.transform.position + new Vector3(0f, -this.Height / 2f, 0f), new Vector3(this.Width, 1f, this.Depth));
+		Gizmos.DrawCube(this.transform.position + new Vector3(this.Width / 2f, 0f, 0f), new Vector3(1f, this.Height, this.Depth));
+		Gizmos.DrawCube(this.transform.position + new Vector3(0f, this.Height / 2f, 0f), new Vector3(this.Width, 1f, this.Depth));
+		Gizmos.DrawCube(this.transform.position + new Vector3(-this.Width / 2f, 0f, 0f), new Vector3(1f, this.Height, this.Depth));
 	}
 }
