@@ -578,7 +578,7 @@ namespace Memewars
 
 		public virtual void Die()
 		{
-			throw new NotImplementedException();
+			PhotonNetwork.Destroy(this.gameObject);
 		}
 
 		[PunRPC]
