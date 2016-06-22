@@ -1,3 +1,4 @@
+.DS_Store
 *.suo
 multiplayer/multiplayer/bin
 multiplayer/multiplayer/obj
@@ -23,7 +24,6 @@ multiplayer/packages
 *.pidb
 *.booproj
 *.svd
-
 
 # Unity3D generated meta files
 *.pidb.meta
