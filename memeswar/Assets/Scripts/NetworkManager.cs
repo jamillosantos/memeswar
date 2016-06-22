@@ -41,6 +41,7 @@ public class NetworkManager : MonoBehaviour
 	{
 		GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity, 0);
 		player.GetComponent<StickmanUserControl>().enabled = true;
+		player.GetComponent<AudioListener>().enabled = true;
 
 		StickmanCharacter c = player.GetComponent<StickmanCharacter>();
 		c.SetArsenal(new Weapon.Weapons[] {
