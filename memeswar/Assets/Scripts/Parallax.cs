@@ -3,7 +3,9 @@ using System.Collections;
 
 public class Parallax : MonoBehaviour
 {
-	public float Damping;
+	public float DampingX;
+
+	public float DampingY;
 
 	private Vector3 _initialPosition;
 
@@ -14,6 +16,6 @@ public class Parallax : MonoBehaviour
 
 	void Update ()
 	{
-		this.transform.localPosition = this._initialPosition + Camera.main.transform.position * this.Damping;
+		this.transform.localPosition = this._initialPosition + new Vector3(Camera.main.transform.position.x * this.DampingX, Camera.main.transform.position.y*this.DampingY, Camera.main.transform.position.z);
 	}
 }
