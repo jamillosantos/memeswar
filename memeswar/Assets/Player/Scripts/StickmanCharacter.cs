@@ -4,6 +4,24 @@ using System;
 
 namespace Memewars
 {
+	
+	class BodyPart
+	{
+		public Collider collider;
+
+		public Rigidbody rigidBody;
+
+		public CharacterJoint joint;
+
+		public BodyPart(CharacterJoint joint)
+		{
+			this.collider = joint.GetComponent<Collider>();
+			this.rigidBody = joint.GetComponent<Rigidbody>();
+			this.joint = joint;
+		}
+	}
+
+
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
@@ -46,14 +64,17 @@ namespace Memewars
 		[SerializeField]
 		float _groundCheckDistance = 0.1f;
 
-		Rigidbody _rigidbody;
-		Animator _animator;
+		private Rigidbody _rigidbody;
+		private Collider _collider;
+		private BodyPart[] _bodyParts;
 
-		bool _isGrounded = true;
+		private Animator _animator;
+
+		private bool _isGrounded = true;
 		
-		float _origGroundCheckDistance;
+		private float _origGroundCheckDistance;
 		
-		const float _half = 0.5f;
+		private const float _half = 0.5f;
 
 		/*
 		float m_CapsuleHeight;
@@ -189,6 +210,7 @@ namespace Memewars
 		/// Altura da cabeça do boneco.
 		/// </summary>
 		private readonly float HEAD_HEIGHT = 1.3f;
+		private bool _ragdolled = false;
 
 		/// <summary>
 		/// Variável que define se o Jetpack está ligado ou não.
@@ -318,20 +340,39 @@ namespace Memewars
 			Debug.Log(Time.timeSinceLevelLoad + ": UpdateWeapon " + newWeapon.gameObject.name);
 		}
 
+		private Boolean Ragdolled
+		{
+			get
+			{
+				return this._ragdolled;
+			}
+			set
+			{
+				this._ragdolled = value;
+				foreach (BodyPart bp in this._bodyParts)
+				{
+					bp.rigidBody.isKinematic = !value;
+				}
+				this._collider.enabled = !value;
+				this._animator.enabled = !value;
+			}
+		}
 
 		void Start()
 		{
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
 			this._animator = this.GetComponent<Animator>();
 
-			CharacterJoint[] joints = this.GetComponentsInChildren<CharacterJoint>();
-			foreach (CharacterJoint joint in joints)
-			{
-				joint.GetComponent<Rigidbody>().isKinematic = true;
-			}
-			this._animator.enabled = true;
-
 			this._rigidbody = this.GetComponent<Rigidbody>();
+			this._collider = this.GetComponent<CapsuleCollider>();
+
+			CharacterJoint[] joints = this.GetComponentsInChildren<CharacterJoint>();
+			this._bodyParts = new BodyPart[joints.Length];
+			for (int i = 0; i < joints.Length; ++i)
+			{
+				this._bodyParts[i] = new BodyPart(joints[i]);
+			}
+			this.Ragdolled = true;
 
 			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
 
