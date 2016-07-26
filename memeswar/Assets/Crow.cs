@@ -40,7 +40,7 @@ public class Crow : MonoBehaviour
 				this.transform.position = this._curve.GetPointAt(time);
 				this.transform.rotation = Quaternion.LookRotation((this._lastPosition - this.transform.position));
 			}
-			catch (System.Exception e)
+			catch (System.Exception)
 			{ }
 		}
 	}

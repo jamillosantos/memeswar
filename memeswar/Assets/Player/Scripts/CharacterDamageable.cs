@@ -1,16 +1,20 @@
 ﻿using Memewars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using UnityEngine;
 
 public class CharacterDamageable : Damageable
 {
 	private StickmanCharacter _stickman;
 
-	void Start()
+	protected override void Start()
 	{
+		base.Start ();
 		this._stickman = this.GetComponent<StickmanCharacter>();
+	}
+
+	public override void Damage(float damage)
+	{
+		Debug.Log ("Ouch " + damage);
+		base.Damage (damage);
 	}
 
 	protected override void Die()

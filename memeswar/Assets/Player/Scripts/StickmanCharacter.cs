@@ -4,9 +4,6 @@ using System;
 
 namespace Memewars
 {
-
-	[RequireComponent(typeof(Rigidbody))]
-	[RequireComponent(typeof(CapsuleCollider))]
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
@@ -97,8 +94,6 @@ namespace Memewars
 		private Bar _ammoUIBar;
 
 		private Vector3 AimOffset = Vector3.up * 1.3f;
-
-		public GameObject AimHandler;
 
 		private Vector3 _relCameraPos;
 
@@ -209,7 +204,7 @@ namespace Memewars
 				if (this._jetpackOn != value)
 				{
 					this._jetpackOn = value;
-					this._jetpackLight.gameObject.SetActive(value);
+					//this._jetpackLight.gameObject.SetActive(value);
 					if (value)
 						this._jetpackFlames.Play(true);
 					else
@@ -327,6 +322,16 @@ namespace Memewars
 		void Start()
 		{
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
+			this._animator = this.GetComponent<Animator>();
+
+			CharacterJoint[] joints = this.GetComponentsInChildren<CharacterJoint>();
+			foreach (CharacterJoint joint in joints)
+			{
+				joint.GetComponent<Rigidbody>().isKinematic = true;
+			}
+			this._animator.enabled = true;
+
+			this._rigidbody = this.GetComponent<Rigidbody>();
 
 			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
 
@@ -341,24 +346,21 @@ namespace Memewars
 			this._jetpackFlames = pSsytems[0];
 			this._jetpackSmoke = pSsytems[1];
 
+			/*
 			this._jetpackLight = this.GetComponentInChildren<Light>();
 			this._jetpackLight.gameObject.SetActive(false);
+			*/
 
 			this._relCameraPos = new Vector3(0, 1.3f, -20f);
 
 			this._jetpackFuel = this._jetpackCapacity;
 			this._jetpackReloadRatio = (this._jetpackCapacity / this._jetpackReloadDuration);
 
-			this._animator = this.GetComponent<Animator>();
-			this._rigidbody = this.GetComponent<Rigidbody>();
-
 			/*
 			this.m_Capsule = this.GetComponent<CapsuleCollider>();
 			this.m_CapsuleHeight = this.m_Capsule.height;
 			this.m_CapsuleCenter = this.m_Capsule.center;
 			*/
-
-			this._rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
 
 			this.UpdateRotation();
 			this._started = true;
@@ -428,7 +430,7 @@ namespace Memewars
 			private set
 			{
 				this._aimDirection = value;
-				this.AimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
+				// this.AimHandler.transform.position = this.transform.position + (value * HEAD_HEIGHT) + this.AimOffset;
 				this._aimAngle = -Mathf.Atan2(this._aimDirection.y, this._aimDirection.x) * Mathf.Rad2Deg;
 			}
 		}
@@ -480,6 +482,7 @@ namespace Memewars
 		void UpdateAnimator()
 		{
 			float amount = ((this.photonView.isMine) ? this._rigidbody.velocity.x : this._updatedVelocity.x ) / this.MaxHorizontalSpeed;
+			Debug.Log(this._animator);
 			this._animator.SetFloat("Forward", Math.Abs(amount), 0.1f, Time.deltaTime);
 			// this.m_Animator.SetFloat("Turn", this.m_TurnAmount, 0.5f, Time.deltaTime);
 			// this.m_Animator.SetBool("Crouch", this.m_Crouching);
@@ -578,7 +581,8 @@ namespace Memewars
 
 		public virtual void Die()
 		{
-			PhotonNetwork.Destroy(this.gameObject);
+			Debug.Log ("It should be dead now!");
+			// PhotonNetwork.Destroy(this.gameObject);
 		}
 
 		[PunRPC]

@@ -23,7 +23,7 @@ public class Damageable : MonoBehaviour
 		}
 	}
 
-	void Start()
+	protected virtual void Start()
 	{
 		this._currentHP = this.MaxHP;
 	}
@@ -34,9 +34,8 @@ public class Damageable : MonoBehaviour
 	/// </summary>
 	/// <param name="damage"></param>
 	/// <see cref="Die" />
-	public void Damage(float damage)
+	public virtual void Damage(float damage)
 	{
-		Debug.Log("Ouchh!! " + this._currentHP + " - " + damage);
 		this._currentHP -= damage;
 		if (this._currentHP <= 0)
 			this.Die();
