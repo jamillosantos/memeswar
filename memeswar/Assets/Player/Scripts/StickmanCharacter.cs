@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 namespace Memewars
 {
@@ -46,6 +47,13 @@ namespace Memewars
 
 		[SerializeField]
 		float _groundCheckDistance = 0.1f;
+
+		public void Ragdoll()
+		{
+			UnityEngine.Object obj = Resources.Load("Ragdoll");
+			RagdollController ragdoll = ((GameObject)Instantiate(obj, this._rootRigidbody.transform.position + Vector3.right*2f, this._rootRigidbody.transform.rotation)).GetComponent<RagdollController>();
+			ragdoll.Mimic(this);
+		}
 
 		private Rigidbody _rootRigidbody;
 		private Collider _rootCollider;
