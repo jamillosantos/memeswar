@@ -32,6 +32,8 @@ namespace Memewars
 				this.StickmanCharacter.WeaponIndex = 3;
 			else if (Input.GetKeyDown(KeyCode.Alpha5))
 				this.StickmanCharacter.WeaponIndex = 4;
+			else if (Input.GetKeyDown(KeyCode.L))
+				this.StickmanCharacter.Ragdolled = !this.StickmanCharacter.Ragdolled;
 
 			if (this.StickmanCharacter.IsGrounded)
 			{
