@@ -514,7 +514,7 @@ namespace Memewars
 			float runCycle = Mathf.Repeat(this._animator.GetCurrentAnimatorStateInfo(0).normalizedTime + this._runCycleLegOffset, 1);
 			float jumpLeg = (runCycle < _half ? 1 : -1) * amount;
 			if (this._isGrounded)
-			{ 
+			{
 				this._animator.SetFloat("JumpLeg", jumpLeg);
 			}
 
