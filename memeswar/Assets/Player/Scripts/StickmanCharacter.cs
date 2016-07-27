@@ -200,6 +200,13 @@ namespace Memewars
 		/// Altura da cabeça do boneco.
 		/// </summary>
 		private readonly float HEAD_HEIGHT = 1.3f;
+		public Rigidbody rootRigidbody
+		{
+			get
+			{
+				return this._rootRigidbody;
+			}
+		}
 
 		/// <summary>
 		/// Variável que define se o Jetpack está ligado ou não.
@@ -475,7 +482,6 @@ namespace Memewars
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
 			this._rootRigidbody.velocity = v;
-			Debug.Log(Time.timeSinceLevelLoad + ": " + v);
 
 			this.JetpackUpdate();
 
