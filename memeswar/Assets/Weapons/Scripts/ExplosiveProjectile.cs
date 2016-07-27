@@ -39,7 +39,7 @@ public class ExplosiveProjectile : Projectile
 		/// Cria colisor esférico para simular a área da explosão.
 		SphereCollider collider = this.gameObject.AddComponent<SphereCollider>();
 		collider.radius = this.Radius;
-			
+
 		/// Desabilita o renderer para que o projétil não seja mais exibido.
 		this.DefaultRenderer.enabled = false;
 
@@ -48,7 +48,7 @@ public class ExplosiveProjectile : Projectile
 
 		/// Vê o ponto mais próximo do objeto na explosão e usa esse dado para computar a distância
 		/// para assim aplicar o dano.
-		Vector3 contactPoint;
+		Vector3 contactPoint, normal;
 		float d;
 		Damageable damageable;
 		foreach (Collider c in colliders)
@@ -58,11 +58,16 @@ public class ExplosiveProjectile : Projectile
 			{
 				contactPoint = c.ClosestPointOnBounds(this.transform.position);
 				d = Vector3.Distance(contactPoint, this.transform.position);
-				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))));
+				normal = (this.transform.position - contactPoint);
+				normal.Normalize();
+				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))), new CollisionInfo(contactPoint, normal));
 			}
 		}
 		if (this.ExplosionEffect)
-			Instantiate(this.ExplosionEffect, this.transform.position, Quaternion.identity);
+		{
+			UnityStandardAssets.Effects.ExplosionPhysicsForce explosion = ((GameObject)Instantiate(this.ExplosionEffect, this.transform.position, Quaternion.identity)).GetComponent<UnityStandardAssets.Effects.ExplosionPhysicsForce>();
+			explosion.Radius = this.Radius;
+		}
 		Destroy(this.gameObject);
 	}
 }

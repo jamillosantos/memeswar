@@ -1,6 +1,25 @@
 ﻿using System;
 using UnityEngine;
 
+public class CollisionInfo
+{
+	public Vector3 point;
+
+	public Vector3 normal;
+
+	public CollisionInfo(ContactPoint contactPoint)
+	{
+		this.point = contactPoint.point;
+		this.normal = contactPoint.normal;
+	}
+
+	public CollisionInfo(Vector3 point, Vector3 normal)
+	{
+		this.point = point;
+		this.normal = normal;
+	}
+}
+
 /// <summary>
 /// Classe que implementa o comportamento básico de um projétil (movimentação inicial, colisões
 /// e danos).
@@ -138,8 +157,14 @@ public class Projectile : Photon.MonoBehaviour
 	/// <see cref="Hit" />
 	public virtual void OnCollisionEnter(Collision collision)
 	{
+		Debug.Log(Time.timeSinceLevelLoad + " - Collision: " + collision.gameObject.name);
 		this._collided = true;
 		this.Hit(collision);
+	}
+
+	public virtual void OnTriggerEnter(Collider other)
+	{
+		Debug.Log(Time.timeSinceLevelLoad + " - Collision: " + other.gameObject.name);
 	}
 
 	/// <summary>
@@ -176,7 +201,9 @@ public class Projectile : Photon.MonoBehaviour
 	protected virtual void ApplyDamage(ContactPoint contact, Damageable damageable)
 	{
 		Debug.Log("Recreasing " + this.Damage + " from " + damageable.CurrentHP);
-		damageable.Damage(this.Damage);
+		Vector3 normal = (this.transform.position - contact.point);
+		normal.Normalize();
+		damageable.Damage(this.Damage, new CollisionInfo(contact.point, normal));
 	}
 
 	protected virtual void OnDestroy()

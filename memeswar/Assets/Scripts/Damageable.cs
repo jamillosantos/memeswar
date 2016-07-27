@@ -34,7 +34,7 @@ public class Damageable : MonoBehaviour
 	/// </summary>
 	/// <param name="damage"></param>
 	/// <see cref="Die" />
-	public virtual void Damage(float damage)
+	public virtual void Damage(float damage, CollisionInfo collisionInfo)
 	{
 		this._currentHP -= damage;
 		if (this._currentHP <= 0)

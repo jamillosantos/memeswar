@@ -9,6 +9,7 @@ namespace UnityStandardAssets.Effects
     {
         public float explosionForce = 4;
 
+		public float Radius = 0;
 
         private IEnumerator Start()
         {
@@ -18,7 +19,9 @@ namespace UnityStandardAssets.Effects
 
             float multiplier = GetComponent<ParticleSystemMultiplier>().multiplier;
 
-            float r = 10*multiplier;
+			if (this.Radius == 0)
+				this.Radius = 10*multiplier;
+			float r = this.Radius;
             var cols = Physics.OverlapSphere(transform.position, r);
             var rigidbodies = new List<Rigidbody>();
             foreach (var col in cols)

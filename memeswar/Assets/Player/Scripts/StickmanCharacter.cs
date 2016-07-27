@@ -347,7 +347,7 @@ namespace Memewars
 
 			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
 
-			if (true || this.photonView.isMine)
+			if (this.photonView.isMine)
 			{
 				this._jetpackUIBar = GameObject.Find("JetpackBar").GetComponent<Bar>();
 				this._jetpackUIBar.Max = this._jetpackCapacity;
@@ -374,7 +374,7 @@ namespace Memewars
 			this.m_CapsuleCenter = this.m_Capsule.center;
 			*/
 
-			this.UpdateRotation();
+			// this.UpdateRotation();
 			this._started = true;
 		}
 
@@ -547,7 +547,7 @@ namespace Memewars
 		/// </summary>
 		void FixedUpdate()
 		{
-			if (true || this.photonView.isMine)
+			if (this.photonView.isMine)
 			{
 				// TODO: Ajustar de acordo com #36
 				Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, this.transform.position + this._relCameraPos, 0.1f);
@@ -557,7 +557,6 @@ namespace Memewars
 				m.z = 0;
 				m.Normalize();
 				this.AimDirection = m;
-
 			}
 			else
 			{
