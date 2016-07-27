@@ -4,107 +4,6 @@ using System;
 
 namespace Memewars
 {
-	public class CharacterJointData
-	{
-		private Vector3 anchor;
-		private bool autoConfigureConnectedAnchor;
-		private Vector3 axis;
-		private float breakForce;
-		private float breakTorque;
-		private Vector3 connectedAnchor;
-		private Rigidbody connectedBody;
-		private bool enableCollision;
-		private bool enablePreprocessing;
-		private bool enableProjection;
-		private SoftJointLimit highTwistLimit;
-		private SoftJointLimit lowTwistLimit;
-		private float projectionAngle;
-		private float projectionDistance;
-		private SoftJointLimit swing1Limit;
-		private SoftJointLimit swing2Limit;
-		private Vector3 swingAxis;
-		private SoftJointLimitSpring swingLimitSpring;
-		private SoftJointLimitSpring twistLimitSpring;
-
-		public CharacterJointData(CharacterJoint jointSource)
-		{
-			this.connectedBody = jointSource.connectedBody;
-			this.anchor = jointSource.anchor;
-			this.axis = jointSource.axis;
-			this.autoConfigureConnectedAnchor = jointSource.autoConfigureConnectedAnchor;
-			this.connectedAnchor = jointSource.connectedAnchor;
-			this.swingAxis = jointSource.swingAxis;
-			this.twistLimitSpring = jointSource.twistLimitSpring;
-			this.lowTwistLimit = jointSource.lowTwistLimit;
-			this.highTwistLimit = jointSource.highTwistLimit;
-			this.swingLimitSpring = jointSource.swingLimitSpring;
-			this.swing1Limit = jointSource.swing1Limit;
-			this.swing2Limit = jointSource.swing2Limit;
-			this.enableProjection = jointSource.enableProjection;
-			this.projectionDistance = jointSource.projectionDistance;
-			this.projectionAngle = jointSource.projectionAngle;
-			this.breakForce = jointSource.breakForce;
-			this.breakTorque = jointSource.breakTorque;
-			this.enableCollision = jointSource.enableCollision;
-			this.enablePreprocessing = jointSource.enablePreprocessing;
-		}
-
-		public void Assign(CharacterJoint joint)
-		{
-			joint.connectedBody = this.connectedBody;
-			joint.anchor = this.anchor;
-			joint.axis = this.axis;
-			joint.autoConfigureConnectedAnchor = this.autoConfigureConnectedAnchor;
-			joint.connectedAnchor = this.connectedAnchor;
-			joint.swingAxis = this.swingAxis;
-			joint.twistLimitSpring = this.twistLimitSpring;
-			joint.lowTwistLimit = this.lowTwistLimit;
-			joint.highTwistLimit = this.highTwistLimit;
-			joint.swingLimitSpring = this.swingLimitSpring;
-			joint.swing1Limit = this.swing1Limit;
-			joint.swing2Limit = this.swing2Limit;
-			joint.enableProjection = this.enableProjection;
-			joint.projectionDistance = this.projectionDistance;
-			joint.projectionAngle = this.projectionAngle;
-			joint.breakForce = this.breakForce;
-			joint.breakTorque = this.breakTorque;
-			joint.enableCollision = this.enableCollision;
-			joint.enablePreprocessing = this.enablePreprocessing;
-
-		}
-	}
-
-	class BodyPart
-	{
-		public GameObject gameObject;
-
-		public Collider collider;
-
-		public Rigidbody rigidBody;
-
-		public CharacterJoint joint;
-
-		public CharacterJointData jointData;
-
-		public BodyPart(Rigidbody rigidb)
-		{
-			this.gameObject = rigidb.gameObject;
-			this.collider = this.gameObject.GetComponent<Collider>();
-			this.rigidBody = rigidb;
-			this.joint = this.gameObject.GetComponent<CharacterJoint>();
-			if (this.joint != null)
-				this.jointData = new CharacterJointData(this.joint);
-		}
-	}
-
-
-	class Body
-	{
-		public BodyPart Hips;
-
-		public Transform RightFoot;
-		public Transform LeftFoot;
-	}
 
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
@@ -150,10 +49,6 @@ namespace Memewars
 
 		private Rigidbody _rootRigidbody;
 		private Collider _rootCollider;
-
-		private BodyPart[] _bodyParts;
-
-		private Body _body;
 
 		private Animator _animator;
 
@@ -297,7 +192,6 @@ namespace Memewars
 		/// Altura da cabeça do boneco.
 		/// </summary>
 		private readonly float HEAD_HEIGHT = 1.3f;
-		private bool _ragdolled = true;
 
 		/// <summary>
 		/// Variável que define se o Jetpack está ligado ou não.
@@ -427,103 +321,13 @@ namespace Memewars
 			Debug.Log(Time.timeSinceLevelLoad + ": UpdateWeapon " + newWeapon.gameObject.name);
 		}
 
-		public Boolean Ragdolled
-		{
-			get
-			{
-				return this._ragdolled;
-			}
-			set
-			{
-				if (this._ragdolled != value)
-				{
-					if (value)
-						Debug.Log("Installing ragdoll");
-					else
-						Debug.Log("Removing ragdoll");
-
-					this._ragdolled = value;
-					this._animator.enabled = !value;
-					foreach (BodyPart bp in this._bodyParts)
-					{
-						bp.rigidBody.isKinematic = this._ragdolled;
-						if (this._ragdolled)
-						{
-							bp.collider.enabled = true;
-							bp.rigidBody.isKinematic = false;
-							if (bp.jointData != null)
-							{
-								CharacterJoint tmp = bp.gameObject.AddComponent<CharacterJoint>();
-								bp.jointData.Assign(tmp);
-							}
-						}
-						else
-						{
-							Destroy(bp.joint);
-							bp.rigidBody.isKinematic = true;
-							bp.collider.enabled = false;
-						}
-					}
-					if (this._ragdolled)
-					{
-						this._rootCollider.enabled = false;
-						this._body.Hips.collider.enabled = true;
-					}
-					else
-					{
-						this._body.Hips.rigidBody.isKinematic = true;
-						this._body.Hips.collider.enabled = true;
-						//
-						this._rootRigidbody.isKinematic = false;
-						this._rootCollider.enabled = true;
-					}
-				}
-			}
-		}
-
 		void Start()
 		{
-			this._body = new Body();
-
 			this._rootRigidbody = this.GetComponent<Rigidbody>();
 			this._rootCollider = this.GetComponent<Collider>();
-			// Radolled enabled by default.
-			// this._rootCollider.enabled = false;
-			// this._rootRigidbody.isKinematic = true;
-			// ---
 
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
 			this._animator = this.GetComponent<Animator>();
-
-			Rigidbody[] rigidBodies = this.GetComponentsInChildren<Rigidbody>();
-			this._bodyParts = new BodyPart[rigidBodies.Length];
-			for (int i = 0; i < rigidBodies.Length; ++i)
-			{
-				this._bodyParts[i] = new BodyPart(rigidBodies[i]);
-				if (this._bodyParts[i].rigidBody.gameObject.name.EndsWith("_Hips"))
-				{
-					this._body.Hips = this._bodyParts[i];
-					this._rootRigidbody = this._body.Hips.rigidBody;
-					this._rootCollider = this._body.Hips.collider;
-				}
-			}
-
-			Transform[] transforms = this.GetComponentsInChildren<Transform>();
-			foreach (Transform t in transforms)
-			{
-				if (t.gameObject.name.EndsWith("_RightFoot"))
-					this._body.RightFoot = t;
-				else if (t.gameObject.name.EndsWith("_LeftFoot"))
-					this._body.LeftFoot = t;
-			}
-
-			if (this._body.Hips == null)
-				throw new Exception("Hips were not found.");
-			if (this._body.LeftFoot == null)
-				throw new Exception("Left foot was not found.");
-			if (this._body.RightFoot == null)
-				throw new Exception("Right foot was not found.");
-			this.Ragdolled = false;
 
 			this._arsenalPlaceholder = this.GetComponentInChildren<Arsenal>();
 
@@ -649,9 +453,6 @@ namespace Memewars
 		/// <param name="move">Parâmetro dos movimentos do jogador.</param>
 		public void Move(Vector3 move)
 		{
-			if (this._ragdolled)
-				return;
-
 			this.UpdateRotation();
 
 			this.CheckGroundStatus();
@@ -666,6 +467,7 @@ namespace Memewars
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
 			this._rootRigidbody.velocity = v;
+			Debug.Log(Time.timeSinceLevelLoad + ": " + v);
 
 			this.JetpackUpdate();
 
@@ -679,10 +481,6 @@ namespace Memewars
 		/// </summary>
 		void UpdateAnimator()
 		{
-			Debug.Log(Time.timeSinceLevelLoad + ": " + this.IsGrounded);
-			if (this._ragdolled)
-				return;
-
 			float amount = ((this.photonView.isMine) ? this._rootRigidbody.velocity.x : this._updatedVelocity.x ) / this.MaxHorizontalSpeed;
 			this._animator.SetFloat("Forward", Math.Abs(amount), 0.1f, Time.deltaTime);
 			// this.m_Animator.SetFloat("Turn", this.m_TurnAmount, 0.5f, Time.deltaTime);
@@ -722,12 +520,9 @@ namespace Memewars
 			RaycastHit hitInfo;
 #if UNITY_EDITOR
 			// helper to visualise the ground check ray in the scene view
-			Debug.DrawLine(this._body.LeftFoot.position, this._body.LeftFoot.position + (Vector3.up * 0.1f) + (Vector3.down * this._groundCheckDistance), Color.blue);
-			Debug.DrawLine(this._body.RightFoot.position, this._body.RightFoot.position + (Vector3.up * 0.1f) + (Vector3.down * this._groundCheckDistance), Color.green);
+			Debug.DrawLine(this.transform.position, this.transform.position + (Vector3.up * 0.1f) + (Vector3.down * this._groundCheckDistance), Color.blue);
 #endif
-			this._isGrounded
-				= Physics.Raycast(this._body.LeftFoot.position, Vector3.down, out hitInfo, this._groundCheckDistance)
-				  || Physics.Raycast(this._body.RightFoot.position, Vector3.down, out hitInfo, this._groundCheckDistance);
+			this._isGrounded = Physics.Raycast(this.transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, this._groundCheckDistance);
 		}
 
 		/// <summary>
@@ -745,10 +540,7 @@ namespace Memewars
 				m.z = 0;
 				m.Normalize();
 				this.AimDirection = m;
-				if (this._ragdolled)
-				{
-					// this._rootRigidbody.transform.position = this._hipsBodypart.rigidBody.transform.position;
-				}
+
 			}
 			else
 			{
