@@ -52,6 +52,7 @@ namespace Memewars
 		{
 			UnityEngine.Object obj = Resources.Load("Ragdoll");
 			RagdollController ragdoll = ((GameObject)Instantiate(obj, this._rootRigidbody.transform.position + Vector3.right*2f, this._rootRigidbody.transform.rotation)).GetComponent<RagdollController>();
+			ragdoll.transform.SetParent(null, true);
 			ragdoll.Mimic(this);
 		}
 
@@ -481,6 +482,8 @@ namespace Memewars
 			{
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
+			Vector3 pos = new Vector3(this.transform.position.x, this.transform.position.y);
+			this.transform.position = pos;
 			this._rootRigidbody.velocity = v;
 
 			this.JetpackUpdate();
