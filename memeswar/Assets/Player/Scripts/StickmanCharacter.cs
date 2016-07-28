@@ -51,9 +51,10 @@ namespace Memewars
 		public void Ragdoll()
 		{
 			UnityEngine.Object obj = Resources.Load("Ragdoll");
-			RagdollController ragdoll = ((GameObject)Instantiate(obj, this._rootRigidbody.transform.position + Vector3.right*2f, this._rootRigidbody.transform.rotation)).GetComponent<RagdollController>();
+			RagdollController ragdoll = ((GameObject)Instantiate(obj, this._rootRigidbody.transform.position, this._rootRigidbody.transform.rotation)).GetComponent<RagdollController>();
 			ragdoll.transform.SetParent(null, true);
 			ragdoll.Mimic(this);
+			this.gameObject.SetActive(false);
 		}
 
 		private Rigidbody _rootRigidbody;
@@ -107,8 +108,6 @@ namespace Memewars
 
 		private Vector3 AimOffset = Vector3.up * 1.3f;
 
-		private Vector3 _relCameraPos;
-
 		private Arsenal _arsenalPlaceholder;
 
 		/// <summary>
@@ -125,6 +124,8 @@ namespace Memewars
 		/// Referência da luz do jetpack.
 		/// </summary>
 		private Light _jetpackLight;
+
+		private HeadSprite _head;
 
 		/// <summary>
 		/// Retorna se o jogador está no chão ou não.
@@ -201,6 +202,9 @@ namespace Memewars
 		/// Altura da cabeça do boneco.
 		/// </summary>
 		private readonly float HEAD_HEIGHT = 1.3f;
+
+		private CameraFollower _cameraFollower;
+
 		public Rigidbody rootRigidbody
 		{
 			get
@@ -342,6 +346,8 @@ namespace Memewars
 			this._rootRigidbody = this.GetComponent<Rigidbody>();
 			this._rootCollider = this.GetComponent<Collider>();
 
+			this._head = this.GetComponentInChildren<HeadSprite>();
+
 			ParticleSystem[] pSsytems = this.GetComponentsInChildren<ParticleSystem>();
 			this._animator = this.GetComponent<Animator>();
 
@@ -363,8 +369,6 @@ namespace Memewars
 			this._jetpackLight.gameObject.SetActive(false);
 			*/
 
-			this._relCameraPos = new Vector3(0, 1.3f, -20f);
-
 			this._jetpackFuel = this._jetpackCapacity;
 			this._jetpackReloadRatio = (this._jetpackCapacity / this._jetpackReloadDuration);
 
@@ -376,6 +380,9 @@ namespace Memewars
 
 			// this.UpdateRotation();
 			this._started = true;
+
+			this._cameraFollower = this.GetComponent<CameraFollower>();
+			this._cameraFollower.enabled = this.photonView.isMine;
 		}
 
 		/// <summary>
@@ -549,9 +556,6 @@ namespace Memewars
 		{
 			if (this.photonView.isMine)
 			{
-				// TODO: Ajustar de acordo com #36
-				Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, this.transform.position + this._relCameraPos, 0.1f);
-
 				/// Código temporário apenas para a exibição da mira. Apenas por enquanto que o jogador ainda não move os braços.
 				Vector3 m = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position - this.AimOffset;
 				m.z = 0;
@@ -599,7 +603,9 @@ namespace Memewars
 
 		public virtual void Die()
 		{
-			Debug.Log ("It should be dead now!");
+			// Debug.Log ("It should be dead now!");
+			this.Ragdoll();
+
 			// PhotonNetwork.Destroy(this.gameObject);
 		}
 
