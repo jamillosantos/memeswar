@@ -14,12 +14,27 @@ public class RagdollController : MonoBehaviour
 {
 
 	private Rigidbody _hipsRigidbody;
+
+	private CameraFollower _cameraFollower;
+
+	private float _disableAt;
+
+	void Update()
+	{
+		if (this._cameraFollower.enabled && (this._disableAt < Time.timeSinceLevelLoad))
+			this._cameraFollower.enabled = false;
+	}
 	
 	public void Mimic(StickmanCharacter stickmanCharacter)
 	{
+		this._cameraFollower = this.GetComponent<CameraFollower>();
+		this._cameraFollower.enabled = false;
+		this._disableAt = Time.timeSinceLevelLoad + 3f;
+
 		Dictionary<string, Part> parts = new Dictionary<string, Part>();
-		foreach (Transform t in stickmanCharacter.GetComponentsInChildren<Transform>())
+		foreach (Transform t in stickmanCharacter.Skeleton.GetComponentsInChildren<Transform>())
 		{
+			Debug.Log(t.gameObject.name);
 			parts.Add(t.gameObject.name, new Part()
 			{
 				transform = t,
@@ -52,5 +67,8 @@ public class RagdollController : MonoBehaviour
 		float massRatio = (this._hipsRigidbody.mass / stickmanCharacter.rootRigidbody.mass);
 		this._hipsRigidbody.velocity = stickmanCharacter.rootRigidbody.velocity * massRatio;
 		this._hipsRigidbody.angularVelocity = stickmanCharacter.rootRigidbody.angularVelocity * massRatio;
+
+		this._cameraFollower.enabled = stickmanCharacter.photonView.isMine;
+			
 	}
 }

@@ -16,7 +16,7 @@ public class CameraFollower : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		if (this._stickman.photonView.isMine)
+		if ((this._stickman != null) && this._stickman.photonView.isMine)
 			Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, this.transform.position + this._relCameraPos, 0.1f);
 	}
 }

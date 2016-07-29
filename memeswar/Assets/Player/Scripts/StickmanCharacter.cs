@@ -341,8 +341,20 @@ namespace Memewars
 			Debug.Log(Time.timeSinceLevelLoad + ": UpdateWeapon " + newWeapon.gameObject.name);
 		}
 
+		private SkeletonReference _skeletonReference;
+
+		public SkeletonReference Skeleton
+		{
+			get
+			{
+				return this._skeletonReference;
+			}
+		}
+
 		void Start()
 		{
+			this._skeletonReference = this.GetComponentInChildren<SkeletonReference>();
+
 			this._rootRigidbody = this.GetComponent<Rigidbody>();
 			this._rootCollider = this.GetComponent<Collider>();
 
