@@ -26,8 +26,7 @@ public class CharacterDamageable : Damageable
 			collisionInfo.point,
 			Quaternion.LookRotation(collisionInfo.point - (Vector3.Dot(collisionInfo.point, collisionInfo.normal)) * collisionInfo.normal, collisionInfo.normal)
 		);
-		// bloodFountain.transform.SetParent(this._stickman.transform, true);
-		// Debug.DrawRay(Vector3.zero, collisionInfo.normal, Color.red, 5);
+		bloodFountain.transform.SetParent(this._stickman.transform, true);
 	}
 
 	protected override void Die()
