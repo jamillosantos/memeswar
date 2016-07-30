@@ -672,7 +672,7 @@ namespace Memewars
 			{
 				this._cameraFollower.enabled = false;
 				this.Ragdoll();
-				this._deaths++;
+				this.BroadcastDeath(info);
 				if (Game.Rules.RespawnMode == RespawnMode.RealTime)
 				{
 					this.Invoke("Respawn", Game.Rules.RespawnTime);
@@ -680,9 +680,17 @@ namespace Memewars
 				if (info.Assassin == this)
 					Debug.Log(this + " commited suicide");
 				else
+				{
 					Debug.Log(this + " was killed by " + info.Assassin);
+				}
 				this._dead = true;
 			}
+		}
+
+		private void BroadcastDeath(DeathInfo info)
+		{
+			this._deaths++;
+			// TODO
 		}
 
 		[PunRPC]

@@ -7,6 +7,7 @@ public class NetworkManager : MonoBehaviour
 {
 	void Start ()
 	{
+		PhotonNetwork.player.name = "CaBraDaPesTe";
 		Debug.Log("PhotonNetwork.sendRate: " + PhotonNetwork.sendRate);
 		this.Connect();
 	}
