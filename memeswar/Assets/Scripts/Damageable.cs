@@ -36,16 +36,27 @@ public class Damageable : MonoBehaviour
 	/// <see cref="Die" />
 	public virtual void Damage(float damage, CollisionInfo collisionInfo)
 	{
-		this._currentHP -= damage;
-		if (this._currentHP <= 0)
-			this.Die();
+		if (this._currentHP > 0)
+		{
+			this._currentHP -= damage;
+			if (this._currentHP <= 0)
+			{
+				this.Die(new DeathInfo
+				{
+					Assassin = collisionInfo.StickmanCharacter,
+					At = Time.timeSinceLevelLoad,
+					By = collisionInfo.Weapon,
+					Dead = null
+				});
+			}
+		}
 	}
 
 	/// <summary>
 	/// Método que coordena a morte do objeto. Este método deve ser chamado pelo método Damage.
 	/// </summary>
 	/// <see cref="Damage(float)" />
-	protected virtual void Die()
+	protected virtual void Die(DeathInfo deathInfo)
 	{
 		Destroy(this.gameObject);
 	}

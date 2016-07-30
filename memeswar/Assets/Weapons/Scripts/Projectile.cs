@@ -1,22 +1,29 @@
-﻿using System;
+﻿using Memewars;
+using System;
 using UnityEngine;
 
 public class CollisionInfo
 {
-	public Vector3 point;
+	public StickmanCharacter StickmanCharacter;
 
-	public Vector3 normal;
+	public Weapon Weapon;
+
+	public Vector3 Point;
+
+	public Vector3 Normal;
 
 	public CollisionInfo(ContactPoint contactPoint)
 	{
-		this.point = contactPoint.point;
-		this.normal = contactPoint.normal;
+		this.Point = contactPoint.point;
+		this.Normal = contactPoint.normal;
 	}
 
-	public CollisionInfo(Vector3 point, Vector3 normal)
+	public CollisionInfo(StickmanCharacter stickmanCharacter, Weapon weapon,  Vector3 point, Vector3 normal)
 	{
-		this.point = point;
-		this.normal = normal;
+		this.StickmanCharacter = stickmanCharacter;
+		this.Weapon = weapon;
+		this.Point = point;
+		this.Normal = normal;
 	}
 }
 
@@ -67,6 +74,10 @@ public class Projectile : Photon.MonoBehaviour
 	/// <see cref="DefaultCollider" />
 	private Collider _defaultCollider;
 
+	private StickmanCharacter _stickmanCharacter;
+
+	private Weapon _weapon;
+
 	/// <summary>
 	/// Colisor padrão do projétil.
 	/// </summary>
@@ -75,6 +86,22 @@ public class Projectile : Photon.MonoBehaviour
 		get
 		{
 			return this._defaultCollider;
+		}
+	}
+
+	public StickmanCharacter StickmanCharacter
+	{
+		get
+		{
+			return this._stickmanCharacter;
+		}
+	}
+
+	public Weapon Weapon
+	{
+		get
+		{
+			return this._weapon;
 		}
 	}
 
@@ -143,8 +170,10 @@ public class Projectile : Photon.MonoBehaviour
 	protected virtual void Update()
 	{ }
 
-	public void Fire(Vector3 direction)
+	public void Fire(StickmanCharacter stickmanCharacter, Weapon weapon, Vector3 direction)
 	{
+		this._stickmanCharacter = stickmanCharacter;
+		this._weapon = weapon;
 		this._firedAt = Time.timeSinceLevelLoad;
 		this._velocity = direction * this.Speed;
 		this._fired = true;
@@ -203,7 +232,7 @@ public class Projectile : Photon.MonoBehaviour
 		Debug.Log("Recreasing " + this.Damage + " from " + damageable.CurrentHP);
 		Vector3 normal = (this.transform.position - contact.point);
 		normal.Normalize();
-		damageable.Damage(this.Damage, new CollisionInfo(contact.point, normal));
+		damageable.Damage(this.Damage, new CollisionInfo(this.StickmanCharacter, this.Weapon, contact.point, normal));
 	}
 
 	protected virtual void OnDestroy()

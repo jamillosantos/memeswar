@@ -60,7 +60,7 @@ public class ExplosiveProjectile : Projectile
 				d = Vector3.Distance(contactPoint, this.transform.position);
 				normal = (this.transform.position - contactPoint);
 				normal.Normalize();
-				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))), new CollisionInfo(contactPoint, normal));
+				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))), new CollisionInfo(this.StickmanCharacter, this.Weapon, contactPoint, normal));
 			}
 		}
 		if (this.ExplosionEffect)

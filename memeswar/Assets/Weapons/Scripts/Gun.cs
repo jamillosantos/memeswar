@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Memewars;
+using System;
 using UnityEngine;
 
 
@@ -67,7 +68,6 @@ public class Gun : Weapon
 	/// </summary>
 	public ParticleSystem MuzzleParticleSystem;
 
-
 	protected override Trigger CreateTrigger1()
 	{
 		return new GunTrigger();
@@ -120,7 +120,7 @@ public class Gun : Weapon
 		{
 			GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, positions[i], Quaternion.identity);
 			bullet.GetComponent<PhotonView>().viewID = networkIds[i];
-			bullet.GetComponent<Projectile>().Fire(directions[i]);
+			bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter, this, directions[i]);
 		}
 	}
 

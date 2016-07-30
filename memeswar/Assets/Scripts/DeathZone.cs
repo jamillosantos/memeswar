@@ -11,7 +11,10 @@ public class DeathZone : MonoBehaviour {
 		{
 			if (player.photonView.isMine)
 			{
-				player.Die();
+				player.Die(new DeathInfo
+				{
+					Assassin = player
+				});
 			}
 		}
 		else

@@ -36,7 +36,43 @@ namespace Memewars
 		/// </summary>
 		private int _lastWeaponIndex = -1;
 
-		public int Deaths = 0;
+		private int _deaths = 0;
+
+		public int Deaths
+		{
+			get
+			{
+				return this._deaths;
+			}
+		}
+
+		private int _kills = 0;
+
+		public int Kills
+		{
+			get
+			{
+				return this._kills;
+			}
+		}
+
+		private float _lastKillAt;
+
+		public float LastKillAt
+		{
+			get
+			{
+				return this._lastKillAt;
+			}
+		}
+
+		public float TimeSinceLastKill
+		{
+			get
+			{
+				return (Time.timeSinceLevelLoad - this._lastKillAt);
+			}
+		}
 
 		public float MaxHorizontalSpeed = 7f;
 
@@ -630,17 +666,21 @@ namespace Memewars
 			this._dead = false;
 		}
 
-		public virtual void Die()
+		public virtual void Die(DeathInfo info)
 		{
 			if (!this._dead)
 			{
 				this._cameraFollower.enabled = false;
 				this.Ragdoll();
-				this.Deaths++;
+				this._deaths++;
 				if (Game.Rules.RespawnMode == RespawnMode.RealTime)
 				{
 					this.Invoke("Respawn", Game.Rules.RespawnTime);
 				}
+				if (info.Assassin == this)
+					Debug.Log(this + " commited suicide");
+				else
+					Debug.Log(this + " was killed by " + info.Assassin);
 				this._dead = true;
 			}
 		}
