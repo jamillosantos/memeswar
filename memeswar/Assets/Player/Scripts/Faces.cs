@@ -62,4 +62,50 @@ public class FacesManager
 			return _unhappy;
 		}
 	}
+
+	static Sprite _troll;
+
+	public static Sprite troll
+	{
+		get
+		{
+			if (_troll == null)
+				_troll = Resources.Load<Sprite>("face_troll");
+			return _troll;
+		}
+	}
+
+	public static Sprite Die
+	{
+		get
+		{
+			int faceIndex = Random.Range(0, 2);
+			switch (faceIndex)
+			{
+				case 0:
+					return bilious;
+				case 1:
+					return unhappy;
+			}
+			return fkme;
+		}
+	}
+
+	public static Sprite Win
+	{
+		get
+		{
+			int faceIndex = Random.Range(0, 2);
+			switch (faceIndex)
+			{
+				case 0:
+					return troll;
+				case 1:
+					return notokay;
+				case 2:
+					return lol;
+			}
+			return fkme;
+		}
+	}
 }

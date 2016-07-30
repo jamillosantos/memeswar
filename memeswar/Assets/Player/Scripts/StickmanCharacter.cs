@@ -36,6 +36,8 @@ namespace Memewars
 		/// </summary>
 		private int _lastWeaponIndex = -1;
 
+		public int Deaths = 0;
+
 		public float MaxHorizontalSpeed = 7f;
 
 		[SerializeField]
@@ -351,8 +353,13 @@ namespace Memewars
 			}
 		}
 
+		private CharacterDamageable _damageable;
+
+		private bool _dead = false;
+
 		void Start()
 		{
+			this._damageable = this.GetComponent<CharacterDamageable>();
 			this._skeletonReference = this.GetComponentInChildren<SkeletonReference>();
 
 			this._rootRigidbody = this.GetComponent<Rigidbody>();
@@ -613,12 +620,29 @@ namespace Memewars
 			}
 		}
 
+		public virtual void Respawn()
+		{
+			this.gameObject.SetActive(true);
+			this._damageable.Reset();
+			this._cameraFollower.enabled = true;
+			this._rootRigidbody.velocity = Vector3.zero;
+			this._head.SetFace(FacesManager.Die, 3);
+			this._dead = false;
+		}
+
 		public virtual void Die()
 		{
-			// Debug.Log ("It should be dead now!");
-			this.Ragdoll();
-
-			// PhotonNetwork.Destroy(this.gameObject);
+			if (!this._dead)
+			{
+				this._cameraFollower.enabled = false;
+				this.Ragdoll();
+				this.Deaths++;
+				if (Game.Rules.RespawnMode == RespawnMode.RealTime)
+				{
+					this.Invoke("Respawn", Game.Rules.RespawnTime);
+				}
+				this._dead = true;
+			}
 		}
 
 		[PunRPC]

@@ -49,4 +49,9 @@ public class Damageable : MonoBehaviour
 	{
 		Destroy(this.gameObject);
 	}
+
+	public void Reset()
+	{
+		this._currentHP = this.MaxHP;
+	}
 }

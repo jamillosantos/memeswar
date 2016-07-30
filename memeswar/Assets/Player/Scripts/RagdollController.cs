@@ -12,7 +12,6 @@ class Part
 
 public class RagdollController : MonoBehaviour
 {
-
 	private Rigidbody _hipsRigidbody;
 
 	private CameraFollower _cameraFollower;
@@ -21,15 +20,20 @@ public class RagdollController : MonoBehaviour
 
 	void Update()
 	{
-		if (this._cameraFollower.enabled && (this._disableAt < Time.timeSinceLevelLoad))
-			this._cameraFollower.enabled = false;
+		this._cameraFollower.enabled = (this._disableAt > Time.timeSinceLevelLoad);
 	}
 	
 	public void Mimic(StickmanCharacter stickmanCharacter)
 	{
-		this._cameraFollower = this.GetComponent<CameraFollower>();
+		this._cameraFollower = this.GetComponentInChildren<CameraFollower>();
 		this._cameraFollower.enabled = false;
-		this._disableAt = Time.timeSinceLevelLoad + 3f;
+		if (stickmanCharacter.photonView.isMine)
+		{
+			this._disableAt = Time.timeSinceLevelLoad + 3f;
+			this._cameraFollower.enabled = true;
+		}
+		else
+			this._disableAt = 0;
 
 		Dictionary<string, Part> parts = new Dictionary<string, Part>();
 		foreach (Transform t in stickmanCharacter.Skeleton.GetComponentsInChildren<Transform>())
@@ -68,7 +72,10 @@ public class RagdollController : MonoBehaviour
 		this._hipsRigidbody.velocity = stickmanCharacter.rootRigidbody.velocity * massRatio;
 		this._hipsRigidbody.angularVelocity = stickmanCharacter.rootRigidbody.angularVelocity * massRatio;
 
-		this._cameraFollower.enabled = stickmanCharacter.photonView.isMine;
-			
+		BloodFountain[] bloods = stickmanCharacter.GetComponentsInChildren<BloodFountain>();
+		foreach (BloodFountain blood in bloods)
+		{
+			blood.transform.SetParent(this._hipsRigidbody.transform, false);
+		}		
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Game : MonoBehaviour {
+public class BloodFountain : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
