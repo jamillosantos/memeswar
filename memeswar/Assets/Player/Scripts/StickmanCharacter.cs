@@ -678,10 +678,15 @@ namespace Memewars
 					this.Invoke("Respawn", Game.Rules.RespawnTime);
 				}
 				if (info.Assassin == this)
+				{
+					PhotonNetwork.player.AddScore(-1);
 					Debug.Log(this + " commited suicide");
+				}
 				else
 				{
 					Debug.Log(this + " was killed by " + info.Assassin);
+					PhotonPlayer assassin = PhotonPlayer.Find(info.Assassin.photonView.ownerId);
+					assassin.AddScore(1);
 				}
 				this._dead = true;
 			}
@@ -690,7 +695,9 @@ namespace Memewars
 		private void BroadcastDeath(DeathInfo info)
 		{
 			this._deaths++;
-			// TODO
+			PhotonNetwork.player.SetCustomProperties(new ExitGames.Client.Photon.Hashtable {
+				{ "Deaths", this._deaths }
+			});
 		}
 
 		[PunRPC]
