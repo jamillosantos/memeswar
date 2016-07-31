@@ -13,10 +13,12 @@ class PhotonPlayerRankingComparer : IComparer<PhotonPlayer>
 
 public class RankingController : MonoBehaviour {
 
-	static UnityEngine.Object RankingItemOriginal = Resources.Load("RankingItem");
+	static UnityEngine.Object RankingItemOriginal;
 
 	void OnEnable()
 	{
+		if (RankingItemOriginal == null)
+			RankingItemOriginal = Resources.Load("RankingItem");
 		foreach (RankingItem ri in this.GetComponentsInChildren<RankingItem>())
 		{
 			Destroy(ri.gameObject);
@@ -24,17 +26,14 @@ public class RankingController : MonoBehaviour {
 
 		List<PhotonPlayer> players = new List<PhotonPlayer>();
 		foreach (PhotonPlayer player in PhotonNetwork.playerList)
-		{
 			players.Add(player);
-		}
 		players.Sort(new PhotonPlayerRankingComparer());
 
 		int i = 0;
 		foreach (PhotonPlayer player in players)
 		{
-			Debug.Log(player.name + ": " + player.GetScore());
 			RankingItem ri = ((GameObject)Instantiate(RankingItemOriginal)).GetComponent<RankingItem>();
-			ri.transform.SetParent(this.transform, true);
+			ri.transform.SetParent(this.gameObject.transform, true);
 			ri.Index = i++;
 			ri.Name = player.name;
 			ri.Score = player.GetScore();
@@ -44,5 +43,15 @@ public class RankingController : MonoBehaviour {
 			else
 				ri.Deaths = 0;
 		}
+	}
+
+	void OnGUI()
+	{
+		string d = "\n\n\n\n\n";
+		foreach (RankingItem ri in this.GetComponentsInChildren<RankingItem>())
+		{
+			d += ri.name + ": " + ri.GetComponent<RectTransform>().anchoredPosition.x + ":" + ri.GetComponent<RectTransform>().anchoredPosition.y + "\n";
+		}
+		GUILayout.Label(d);
 	}
 }

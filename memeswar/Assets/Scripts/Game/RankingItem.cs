@@ -30,7 +30,7 @@ public class RankingItem : MonoBehaviour
 		}
 		set
 		{
-			this._indexValue = value+1;
+			this._indexValue = value;
 		}
 	}
 
@@ -85,9 +85,14 @@ public class RankingItem : MonoBehaviour
 	public void Apply()
 	{ 
 		this._rectTransform.anchoredPosition = new Vector3(60, -170 - (35 * this._indexValue));
-		this._index.text = this._indexValue.ToString();
+		this._index.text = (this._indexValue + 1).ToString();
 		this._name.text = this._nameValue;
 		this._score.text = this._scoreValue.ToString();
 		this._deaths.text = this._deathsValue.ToString();
+	}
+
+	void OnGUI()
+	{
+		GUILayout.Label("Data: " + this._indexValue + ": " + this._nameValue + ": " + this._rectTransform.anchoredPosition.y);
 	}
 }
