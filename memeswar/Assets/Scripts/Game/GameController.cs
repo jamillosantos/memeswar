@@ -10,13 +10,13 @@ public class GameController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		this.Ranking.enabled = false;
+		this.Ranking.gameObject.SetActive(false);
 	}
-	
+
 	// Update is called once per frame
 	void Update ()
 	{
-		this.Ranking.enabled = Input.GetKey(KeyCode.Tab);
-		this.HUD.enabled = !this.Ranking.enabled;
+		this.Ranking.gameObject.SetActive(Input.GetKey(KeyCode.Tab));
+		this.HUD.gameObject.SetActive(!this.Ranking.gameObject.GetActive());
 	}
 }
