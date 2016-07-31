@@ -21,6 +21,7 @@ public class NetworkManager : MonoBehaviour
 	void OnGUI()
 	{
 		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+		GUILayout.Label("PlayerList: " + PhotonNetwork.playerList.Length);
 	}
 
 	void OnJoinedLobby()

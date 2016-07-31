@@ -20,6 +20,9 @@ namespace Memewars
 
 		private void Update()
 		{
+			if (!GameController.Instance.ControllersEnabled)
+				return;
+
 			this.InputMouse();
 
 			if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -74,6 +77,9 @@ namespace Memewars
 		// Fixed update is called in sync with physics
 		private void FixedUpdate()
 		{
+			if (!GameController.Instance.ControllersEnabled)
+				return;
+
 			if (this._jump)
 			{
 				this._jump = false;
