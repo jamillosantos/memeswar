@@ -83,7 +83,7 @@ public class RankingItem : MonoBehaviour
 	}
 
 	public void Apply()
-	{
+	{ 
 		this._rectTransform.anchoredPosition = new Vector3(60, -170 - (35 * this._indexValue));
 		this._index.text = this._indexValue.ToString();
 		this._name.text = this._nameValue;

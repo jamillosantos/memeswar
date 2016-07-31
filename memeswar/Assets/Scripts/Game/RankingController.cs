@@ -38,12 +38,11 @@ public class RankingController : MonoBehaviour {
 			ri.Index = i++;
 			ri.Name = player.name;
 			ri.Score = player.GetScore();
-			ri.Deaths = 0; // TODO
+			object deaths = 0;
+			if (player.customProperties.TryGetValue("Deaths", out deaths))
+				ri.Deaths = (int)deaths;
+			else
+				ri.Deaths = 0;
 		}
-	}
-
-	void Update ()
-	{
-		//
 	}
 }
