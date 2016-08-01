@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour
 	{
 		_instance = this;
 		this.Ranking.gameObject.SetActive(false);
+		this.Options.enabled = false;
 	}
 
 	// Update is called once per frame

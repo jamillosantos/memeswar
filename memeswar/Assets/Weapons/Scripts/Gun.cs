@@ -121,6 +121,10 @@ public class Gun : Weapon
 			GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, positions[i], Quaternion.identity);
 			bullet.GetComponent<PhotonView>().viewID = networkIds[i];
 			bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter, this, directions[i]);
+			if (this.StickmanCharacter.photonView.isMine)
+				bullet.layer = Layer.BulletsMyself;
+			else
+				bullet.layer = Layer.Bullets;
 		}
 	}
 

@@ -98,6 +98,14 @@ namespace Memewars
 		private Rigidbody _rootRigidbody;
 		private Collider _rootCollider;
 
+		public Collider RootCollider
+		{
+			get
+			{
+				return this._rootCollider;
+			}
+		}
+
 		private Animator _animator;
 
 		private bool _isGrounded = true;
@@ -395,6 +403,13 @@ namespace Memewars
 
 		void Start()
 		{
+			if (this.photonView.isMine)
+				this.gameObject.layer = Layer.Myself;
+			else
+				this.gameObject.layer = Layer.Players;
+			foreach (Collider c in this.gameObject.GetComponentsInChildren<Collider>())
+				c.gameObject.layer = this.gameObject.layer;
+
 			this._damageable = this.GetComponent<CharacterDamageable>();
 			this._skeletonReference = this.GetComponentInChildren<SkeletonReference>();
 

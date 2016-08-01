@@ -36,10 +36,6 @@ public class ExplosiveProjectile : Projectile
 		/// Desabilita colisor padrão
 		this.DefaultCollider.enabled = false;
 
-		/// Cria colisor esférico para simular a área da explosão.
-		SphereCollider collider = this.gameObject.AddComponent<SphereCollider>();
-		collider.radius = this.Radius;
-
 		/// Desabilita o renderer para que o projétil não seja mais exibido.
 		this.DefaultRenderer.enabled = false;
 
