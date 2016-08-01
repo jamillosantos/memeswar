@@ -187,7 +187,6 @@ namespace Memewars
 		[PunRPC]
 		public void SetArsenal(Weapon.Weapons[] arsenal)
 		{
-			Debug.Log(Time.timeSinceLevelLoad + ": SetArsenal " + this.photonView.isMine);
 			if (!this.photonView.isMine)
 			{
 				foreach (Weapon.Weapons w in arsenal)

@@ -65,4 +65,7 @@ public class Damageable : MonoBehaviour
 	{
 		this._currentHP = this.MaxHP;
 	}
+
+	protected virtual void Update()
+	{ }
 }

@@ -5,6 +5,8 @@ public class CharacterDamageable : Damageable
 {
 	private StickmanCharacter _stickman;
 
+	private HPBar _hpBar;
+
 	static UnityEngine.Object BloodFountain;
 
 	protected override void Start()
@@ -14,6 +16,11 @@ public class CharacterDamageable : Damageable
 
 		base.Start ();
 		this._stickman = this.GetComponent<StickmanCharacter>();
+		if (this._stickman.photonView.isMine)
+		{
+			this._hpBar = GameObject.FindObjectOfType<HPBar>();
+			this._hpBar.Max = this.MaxHP;
+		}
 	}
 
 	public override void Damage(float damage, CollisionInfo collisionInfo)
@@ -27,10 +34,13 @@ public class CharacterDamageable : Damageable
 			Quaternion.LookRotation(collisionInfo.Point - (Vector3.Dot(collisionInfo.Point, collisionInfo.Normal)) * collisionInfo.Normal, collisionInfo.Normal)
 		);
 		bloodFountain.transform.SetParent(this._stickman.transform, true);
+		if (this._stickman.photonView.isMine)
+			this._hpBar.Current = this.CurrentHP;
 	}
 
 	protected override void Die(DeathInfo deathInfo)
 	{
+		deathInfo.Dead = this._stickman;
 		this._stickman.Die(deathInfo);
 	}
 }
