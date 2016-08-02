@@ -57,7 +57,11 @@ namespace Memewars
 		{
 			get
 			{
-				return this._deaths;
+				object deaths;
+				if (this.photonView.owner.customProperties.TryGetValue("Deaths", out deaths))
+					return (int)deaths;
+				else
+					return 0;
 			}
 		}
 
@@ -67,7 +71,7 @@ namespace Memewars
 		{
 			get
 			{
-				return this._kills;
+				return this.photonView.owner.GetScore();
 			}
 		}
 
@@ -576,10 +580,11 @@ namespace Memewars
 			{
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
-			/*
+
+			/// Confirmar que o jogador nunca sairá da posição z = 0
 			Vector3 pos = new Vector3(this.transform.position.x, this.transform.position.y);
 			this.transform.position = pos;
-			*/
+
 			// this._rootRigidbody.velocity = v;
 			this._rootRigidbody.velocity = Vector3.Lerp(this._rootRigidbody.velocity, v, 0.2f);
 
@@ -708,6 +713,9 @@ namespace Memewars
 				this._cameraFollower.enabled = false;
 				this.Ragdoll();
 				this.BroadcastDeath(info);
+				PhotonNetwork.player.SetCustomProperties(new ExitGames.Client.Photon.Hashtable {
+					{ "Deaths", this.Deaths+1 }
+				});
 				if (Game.Rules.RespawnMode == RespawnMode.RealTime)
 				{
 					this.Invoke("Respawn", Game.Rules.RespawnTime);
@@ -720,8 +728,7 @@ namespace Memewars
 				else
 				{
 					Debug.Log(this + " was killed by " + info.Assassin);
-					PhotonPlayer assassin = PhotonPlayer.Find(info.Assassin.photonView.ownerId);
-					assassin.AddScore(1);
+					info.Assassin.photonView.owner.AddScore(1);
 				}
 				this._dead = true;
 			}
@@ -729,10 +736,6 @@ namespace Memewars
 
 		private void BroadcastDeath(DeathInfo info)
 		{
-			this._deaths++;
-			PhotonNetwork.player.SetCustomProperties(new ExitGames.Client.Photon.Hashtable {
-				{ "Deaths", this._deaths }
-			});
 			this.photonView.RPC("NetworkDeath", PhotonTargets.OthersBuffered);
 		}
 
