@@ -1,20 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 using Memewars;
 
 public class NetworkManager : MonoBehaviour
 {
 	void Start ()
 	{
-		PhotonNetwork.player.name = "CaBraDaPesTe";
-		Debug.Log("PhotonNetwork.sendRate: " + PhotonNetwork.sendRate);
-		this.Connect();
+		if (!PhotonNetwork.connected)
+			this.Connect();
 	}
 
 	void Connect()
 	{
-		// PhotonNetwork.offlineMode = true;
+		if (!PhotonNetwork.connected)
+			PhotonNetwork.player.name = "Jogador" + Random.Range(0, 123123451).ToString();
+
 		PhotonNetwork.ConnectUsingSettings("v0.0");
 	}
 
@@ -22,21 +21,7 @@ public class NetworkManager : MonoBehaviour
 	{
 		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
 		GUILayout.Label("PlayerList: " + PhotonNetwork.playerList.Length);
-	}
-
-	void OnJoinedLobby()
-	{
-		PhotonNetwork.JoinRandomRoom();
-	}
-
-	void OnPhotonRandomJoinFailed()
-	{
-		PhotonNetwork.CreateRoom("Sangria desatada");
-	}
-
-	void OnJoinedRoom()
-	{
-		this.CreateMyPlayer();
+		GUILayout.Label("RoomList: " + PhotonNetwork.GetRoomList().Length);
 	}
 
 	private void CreateMyPlayer()

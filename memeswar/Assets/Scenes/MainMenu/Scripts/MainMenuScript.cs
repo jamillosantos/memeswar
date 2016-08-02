@@ -20,12 +20,13 @@ public class MainMenuScript : MonoBehaviour
 	void Start()
 	{
 		this.QuitGameConfirmationCanvas.enabled = false;
-		this.FindGameCanvas.enabled = false;
+		this.FindGameCanvas.gameObject.SetActive(false);
 	}
 
 	public void FindGameClick()
 	{
-		this.FindGameCanvas.enabled = true;
+		this.gameObject.SetActive(false);
+		this.FindGameCanvas.gameObject.SetActive(true);
 	}
 
 	public void CreateGameClick()
@@ -40,6 +41,7 @@ public class MainMenuScript : MonoBehaviour
 
 	public void QuitClick()
 	{
+		this.enabled = false;
 		this.QuitGameConfirmationCanvas.enabled = true;
 	}
 
@@ -50,6 +52,7 @@ public class MainMenuScript : MonoBehaviour
 
 	public void QuitNoClick()
 	{
+		this.enabled = true;
 		this.QuitGameConfirmationCanvas.enabled = false;
 	}
 }
