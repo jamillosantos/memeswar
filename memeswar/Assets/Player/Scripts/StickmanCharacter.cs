@@ -730,7 +730,19 @@ namespace Memewars
 			PhotonNetwork.player.SetCustomProperties(new ExitGames.Client.Photon.Hashtable {
 				{ "Deaths", this._deaths }
 			});
-			// this.photonView.RPC("NetworkDeath", PhotonTargets.OthersBuffered, info);
+			this.photonView.RPC("NetworkDeath", PhotonTargets.OthersBuffered);
+		}
+
+		[PunRPC]
+		protected void NetworkDeath()
+		{
+			this._cameraFollower.enabled = false;
+			this.Ragdoll();
+			if (Game.Rules.RespawnMode == RespawnMode.RealTime)
+			{
+				this.Invoke("Respawn", Game.Rules.RespawnTime);
+			}
+			this._dead = true;
 		}
 
 		[PunRPC]

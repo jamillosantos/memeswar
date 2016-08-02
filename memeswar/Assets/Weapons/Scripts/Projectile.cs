@@ -211,7 +211,7 @@ public class Projectile : Photon.MonoBehaviour
 			Damageable damageable;
 			foreach (ContactPoint contact in collision.contacts)
 			{
-				damageable = contact.otherCollider.GetComponent<Damageable>();
+				damageable = contact.otherCollider.GetComponentInParent<Damageable>();
 				if (damageable)
 					 this.ApplyDamage(contact, damageable);
 			}

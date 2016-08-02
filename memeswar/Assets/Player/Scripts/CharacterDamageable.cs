@@ -16,7 +16,6 @@ public class CharacterDamageable : Damageable
 
 		base.Start ();
 		this._stickman = this.GetComponent<StickmanCharacter>();
-		// this.gameObject.SetActive(this._stickman.photonView.isMine);
 		if (this._stickman.photonView.isMine)
 		{
 			this._hpBar = GameObject.FindObjectOfType<HPBar>();
@@ -28,8 +27,8 @@ public class CharacterDamageable : Damageable
 	public override void Damage(float damage, CollisionInfo collisionInfo)
 	{
 		base.Damage (damage, collisionInfo);
-		Debug.Log("Direction: " + Quaternion.FromToRotation(transform.up, collisionInfo.Normal).eulerAngles);
-		Debug.Log("Normal: " + collisionInfo.Normal);
+		// Debug.Log("Direction: " + Quaternion.FromToRotation(transform.up, collisionInfo.Normal).eulerAngles);
+		// Debug.Log("Normal: " + collisionInfo.Normal);
 		GameObject bloodFountain = (GameObject)Instantiate(
 			BloodFountain,
 			collisionInfo.Point,
