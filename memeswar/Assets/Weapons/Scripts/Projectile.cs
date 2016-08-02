@@ -162,8 +162,8 @@ public class Projectile : Photon.MonoBehaviour
 	{
 		this._defaultRenderer = this.GetComponent<Renderer>();
 		Collider[] colliders = this.GetComponents<Collider>();
-		foreach (Collider c in colliders)
-			c.enabled = this.photonView.isMine;
+//		foreach (Collider c in colliders)
+//			c.enabled = this.photonView.isMine;
 		this._defaultCollider = colliders[0];
 		if (this.photonView.isMine)
 			this.gameObject.layer = Layer.BulletsMyself;
@@ -192,14 +192,12 @@ public class Projectile : Photon.MonoBehaviour
 	/// <see cref="Hit" />
 	public virtual void OnCollisionEnter(Collision collision)
 	{
-		Debug.Log(Time.timeSinceLevelLoad + " - Collision: " + collision.gameObject.name);
 		this._collided = true;
 		this.Hit(collision);
 	}
 
 	public virtual void OnTriggerEnter(Collider other)
 	{
-		Debug.Log(Time.timeSinceLevelLoad + " - Collision: " + other.gameObject.name);
 	}
 
 	/// <summary>
@@ -208,7 +206,7 @@ public class Projectile : Photon.MonoBehaviour
 	/// <param name="collision">Objeto que contém todos os dados da colisão.</param>
 	protected virtual void Hit(Collision collision)
 	{
-		if (this.photonView.isMine)
+		if (!this.photonView.isMine)
 		{
 			Damageable damageable;
 			foreach (ContactPoint contact in collision.contacts)
@@ -217,10 +215,8 @@ public class Projectile : Photon.MonoBehaviour
 				if (damageable)
 					 this.ApplyDamage(contact, damageable);
 			}
-			this.DestroyVisualEffect(collision.contacts[0].point);
-			this.photonView.RPC("DestroyProjectile", PhotonTargets.Others, collision.contacts[0].point);
-			Destroy(this.gameObject);
 		}
+		this.photonView.RPC("DestroyProjectile", PhotonTargets.AllBuffered, collision.contacts[0].point);
 	}
 
 	private void DestroyVisualEffect(Vector3 point)
@@ -235,10 +231,10 @@ public class Projectile : Photon.MonoBehaviour
 	/// <param name="damageable">Objeto que sofrerá o dano.</param>
 	protected virtual void ApplyDamage(ContactPoint contact, Damageable damageable)
 	{
-		Debug.Log("Recreasing " + this.Damage + " from " + damageable.CurrentHP);
 		Vector3 normal = (this.transform.position - contact.point);
 		normal.Normalize();
-		damageable.Damage(this.Damage, new CollisionInfo(this.StickmanCharacter, this.Weapon, contact.point, normal));
+		if (!this.photonView.isMine)
+			damageable.Damage(this.Damage, new CollisionInfo(this.StickmanCharacter, this.Weapon, contact.point, normal));
 	}
 
 	protected virtual void OnDestroy()
@@ -248,7 +244,8 @@ public class Projectile : Photon.MonoBehaviour
 	protected virtual void DestroyProjectile(Vector3 point)
 	{
 		this.DestroyVisualEffect(point);
-		Destroy(this.gameObject);
+		if (this.photonView.isMine)
+			PhotonNetwork.Destroy(this.photonView);
 	}
 }
 

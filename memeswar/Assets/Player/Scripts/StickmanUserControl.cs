@@ -74,7 +74,6 @@ namespace Memewars
 			}
 		}
 
-		// Fixed update is called in sync with physics
 		private void FixedUpdate()
 		{
 			if (!GameController.Instance.ControllersEnabled)
