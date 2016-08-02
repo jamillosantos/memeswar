@@ -6,6 +6,21 @@ using System.Collections.Generic;
 namespace Memewars
 {
 
+	public class Players
+	{
+		static Dictionary<int, StickmanCharacter> players = new Dictionary<int, StickmanCharacter>();
+
+		public static void Set(PhotonPlayer player, StickmanCharacter stickman)
+		{
+			players[player.ID] = stickman;
+		}
+
+		public static StickmanCharacter Get(PhotonPlayer player)
+		{
+			return players[player.ID];
+		}
+	}
+
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
@@ -399,28 +414,14 @@ namespace Memewars
 
 		private bool _dead = false;
 
-		private PhotonPlayer _photonPlayer;
-
-		public PhotonPlayer PhotonPlayer
-		{
-			get
-			{
-				return this._photonPlayer;
-			}
-		}
-
 		void Start()
 		{
 			if (this.photonView.isMine)
-			{
-				this._photonPlayer = PhotonNetwork.player;
 				this.gameObject.layer = Layer.Myself;
-			}
 			else
-			{
-				this._photonPlayer = PhotonPlayer.Find(this.photonView.OwnerActorNr);
 				this.gameObject.layer = Layer.Players;
-			}
+
+			Players.Set(this.photonView.owner, this);
 			foreach (Collider c in this.gameObject.GetComponentsInChildren<Collider>())
 				c.gameObject.layer = this.gameObject.layer;
 
@@ -737,7 +738,7 @@ namespace Memewars
 		{
 			if (this.Weapon is Gun)
 			{
-				((Gun)this.Weapon).CreateProjectile1(networkIds, directions, positions);
+				((Gun)this.Weapon).CreateProjectile1(directions, positions);
 			}
 		}
 	}

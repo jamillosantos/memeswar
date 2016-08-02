@@ -49,14 +49,14 @@ public class CharacterDamageable : Damageable
 		get
 		{
 			object hp;
-			if (this._stickman.PhotonPlayer.customProperties.TryGetValue("HP", out hp))
+			if (this._stickman.photonView.owner.customProperties.TryGetValue("HP", out hp))
 				return (float)hp;
 			else
 				return this.MaxHP;
 		}
 		protected set
 		{
-			this._stickman.PhotonPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable()
+			this._stickman.photonView.owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable()
 			{
 				{ "HP", value }
 			});

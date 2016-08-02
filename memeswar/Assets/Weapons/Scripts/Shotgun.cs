@@ -25,7 +25,7 @@ public class Shotgun
 			directions[i] = this.StickmanCharacter.AimDirection + new Vector3(Random.Range(-0.07f, 0.07f), Random.Range(-0.07f, 0.07f));
 			positions[i] = this.BulletSpawnPoint.transform.position;
 		}
-		this.CreateProjectile1(networkIds, directions, positions);
-		this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
+		this.CreateProjectile1(directions, positions);
+		// this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
 	}
 }

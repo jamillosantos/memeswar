@@ -113,18 +113,14 @@ public class Gun : Weapon
 	/// <summary>
 	/// Cria os projéteis que serão disparados para o Trigger1.
 	/// </summary>
-	public virtual void CreateProjectile1(int[] networkIds, Vector3[] directions, Vector3[] positions)
+	public virtual void CreateProjectile1(Vector3[] directions, Vector3[] positions)
 	{
 		this.VisualFireEffect();
-		for (uint i = 0; i < networkIds.Length; i++)
+		for (uint i = 0; i < directions.Length; i++)
 		{
-			GameObject bullet = (GameObject)Instantiate(this.BulletPrefab, positions[i], Quaternion.identity);
-			bullet.GetComponent<PhotonView>().viewID = networkIds[i];
-			bullet.GetComponent<Projectile>().Fire(this.StickmanCharacter, this, directions[i]);
-			if (this.StickmanCharacter.photonView.isMine)
-				bullet.layer = Layer.BulletsMyself;
-			else
-				bullet.layer = Layer.Bullets;
+			GameObject bullet = PhotonNetwork.Instantiate(this.BulletPrefab.name, positions[i], Quaternion.identity, 0, new object[] {
+				directions[i]
+			});
 		}
 	}
 
@@ -148,11 +144,11 @@ public class Gun : Weapon
 
 	protected virtual void TriggerCreateProjectile1()
 	{
-		int[] networkIds = new int[] { PhotonNetwork.AllocateViewID() };
+		// int[] networkIds = new int[] { PhotonNetwork.AllocateViewID() };
 		Vector3[] directions = new Vector3[] { this.StickmanCharacter.AimDirection };
 		Vector3[] positions = new Vector3[] { this.BulletSpawnPoint.transform.position };
-		this.CreateProjectile1(networkIds, directions, positions);
-		this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
+		this.CreateProjectile1(directions, positions);
+		// this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
 	}
 
 	/// <summary>

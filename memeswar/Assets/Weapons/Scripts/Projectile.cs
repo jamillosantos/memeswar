@@ -165,15 +165,21 @@ public class Projectile : Photon.MonoBehaviour
 		foreach (Collider c in colliders)
 			c.enabled = this.photonView.isMine;
 		this._defaultCollider = colliders[0];
+		if (this.photonView.isMine)
+			this.gameObject.layer = Layer.BulletsMyself;
+		else
+			this.gameObject.layer = Layer.Bullets;
+
+		this._stickmanCharacter = Players.Get(this.photonView.owner);
+		this._weapon = this._stickmanCharacter.Weapon;
+		this.Fire((Vector3)this.photonView.instantiationData[0]);
 	}
 
 	protected virtual void Update()
 	{ }
 
-	public void Fire(StickmanCharacter stickmanCharacter, Weapon weapon, Vector3 direction)
+	public virtual void Fire(Vector3 direction)
 	{
-		this._stickmanCharacter = stickmanCharacter;
-		this._weapon = weapon;
 		this._firedAt = Time.timeSinceLevelLoad;
 		this._velocity = direction * this.Speed;
 		this._fired = true;
