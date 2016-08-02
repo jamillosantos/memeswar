@@ -576,9 +576,12 @@ namespace Memewars
 			{
 				v.x = Mathf.Clamp(v.x + move.x * this.MaxHorizontalSpeed * Time.deltaTime, -this.MaxHorizontalSpeed, this.MaxHorizontalSpeed);
 			}
+			/*
 			Vector3 pos = new Vector3(this.transform.position.x, this.transform.position.y);
 			this.transform.position = pos;
-			this._rootRigidbody.velocity = v;
+			*/
+			// this._rootRigidbody.velocity = v;
+			this._rootRigidbody.velocity = Vector3.Lerp(this._rootRigidbody.velocity, v, 0.2f);
 
 			this.JetpackUpdate();
 
@@ -753,5 +756,6 @@ namespace Memewars
 				((Gun)this.Weapon).CreateProjectile1(directions, positions);
 			}
 		}
+	
 	}
 }

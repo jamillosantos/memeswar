@@ -27,6 +27,16 @@ public class Gun : Weapon
 	/// </summary>
 	public float ReloadAmount;
 
+	/// <summary>
+	/// Força de recuo da arma quando atirando no solo.
+	/// </summary>
+	public float GroundedRecoilForce = 1f;
+
+	/// <summary>
+	/// Força de recuo da arma quando atirado no ar.
+	/// </summary>
+	public float AirRecoilForce = 1f;
+
 	/// <see cref="LastShotAt" />
 	public float _lastShotAt;
 
@@ -115,6 +125,10 @@ public class Gun : Weapon
 	/// </summary>
 	public virtual void CreateProjectile1(Vector3[] directions, Vector3[] positions)
 	{
+		if (this.StickmanCharacter.IsGrounded)
+			this.StickmanCharacter.rootRigidbody.velocity += (this.StickmanCharacter.AimDirection * -1 * this.GroundedRecoilForce);
+		else
+			this.StickmanCharacter.rootRigidbody.velocity += (this.StickmanCharacter.AimDirection * -1 * this.AirRecoilForce);
 		this.VisualFireEffect();
 		for (uint i = 0; i < directions.Length; i++)
 		{
