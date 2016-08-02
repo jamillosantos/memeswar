@@ -15,11 +15,15 @@ public class Damageable : MonoBehaviour
 	/// <summary>
 	/// HP atual do objeto.
 	/// </summary>
-	public float CurrentHP
+	public virtual float CurrentHP
 	{
 		get
 		{
 			return this._currentHP;
+		}
+		protected set
+		{
+			this._currentHP = value;
 		}
 	}
 
@@ -27,6 +31,9 @@ public class Damageable : MonoBehaviour
 	{
 		this._currentHP = this.MaxHP;
 	}
+
+	protected virtual void UpdateHP()
+	{ }
 	
 	/// <summary>
 	/// Método que computa inflige o dano neste objeto. Dependendo do estado, ele também irá disparar
@@ -38,7 +45,8 @@ public class Damageable : MonoBehaviour
 	{
 		if (this._currentHP > 0)
 		{
-			this._currentHP -= damage;
+			this.CurrentHP -= damage;
+			this.UpdateHP();
 			if (this._currentHP <= 0)
 			{
 				this.Die(new DeathInfo
@@ -63,7 +71,8 @@ public class Damageable : MonoBehaviour
 
 	public void Reset()
 	{
-		this._currentHP = this.MaxHP;
+		this.CurrentHP = this.MaxHP;
+		this.UpdateHP();
 	}
 
 	protected virtual void Update()

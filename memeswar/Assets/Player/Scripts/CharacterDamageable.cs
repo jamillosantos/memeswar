@@ -16,10 +16,12 @@ public class CharacterDamageable : Damageable
 
 		base.Start ();
 		this._stickman = this.GetComponent<StickmanCharacter>();
+		// this.gameObject.SetActive(this._stickman.photonView.isMine);
 		if (this._stickman.photonView.isMine)
 		{
 			this._hpBar = GameObject.FindObjectOfType<HPBar>();
 			this._hpBar.Max = this.MaxHP;
+			this.UpdateHP();
 		}
 	}
 
@@ -34,13 +36,40 @@ public class CharacterDamageable : Damageable
 			Quaternion.LookRotation(collisionInfo.Point - (Vector3.Dot(collisionInfo.Point, collisionInfo.Normal)) * collisionInfo.Normal, collisionInfo.Normal)
 		);
 		bloodFountain.transform.SetParent(this._stickman.transform, true);
-		if (this._stickman.photonView.isMine)
-			this._hpBar.Current = this.CurrentHP;
 	}
 
 	protected override void Die(DeathInfo deathInfo)
 	{
 		deathInfo.Dead = this._stickman;
 		this._stickman.Die(deathInfo);
+	}
+
+	public override float CurrentHP
+	{
+		get
+		{
+			object hp;
+			if (this._stickman.PhotonPlayer.customProperties.TryGetValue("HP", out hp))
+				return (float)hp;
+			else
+				return this.MaxHP;
+		}
+		protected set
+		{
+			this._stickman.PhotonPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable()
+			{
+				{ "HP", value }
+			});
+			base.CurrentHP = value;
+		}
+	}
+
+	protected override void UpdateHP()
+	{
+		base.UpdateHP();
+		if (this._stickman.photonView.isMine)
+		{
+			this._hpBar.Current = this.CurrentHP;
+		}
 	}
 }

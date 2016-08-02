@@ -200,7 +200,6 @@ namespace Memewars
 				this.ReplaceWeapon(i, w);
 				i++;
 			}
-
 			if (this.photonView.isMine && this._started)
 				this.photonView.RPC("SetArsenal", PhotonTargets.Others, arsenal);
 		}
@@ -400,12 +399,28 @@ namespace Memewars
 
 		private bool _dead = false;
 
+		private PhotonPlayer _photonPlayer;
+
+		public PhotonPlayer PhotonPlayer
+		{
+			get
+			{
+				return this._photonPlayer;
+			}
+		}
+
 		void Start()
 		{
 			if (this.photonView.isMine)
+			{
+				this._photonPlayer = PhotonNetwork.player;
 				this.gameObject.layer = Layer.Myself;
+			}
 			else
+			{
+				this._photonPlayer = PhotonPlayer.Find(this.photonView.OwnerActorNr);
 				this.gameObject.layer = Layer.Players;
+			}
 			foreach (Collider c in this.gameObject.GetComponentsInChildren<Collider>())
 				c.gameObject.layer = this.gameObject.layer;
 
@@ -449,6 +464,8 @@ namespace Memewars
 
 			// this.UpdateRotation();
 			this._started = true;
+
+			this.SetArsenal((Weapon.Weapons[])this.photonView.instantiationData[0]);
 
 			this._cameraFollower = this.GetComponent<CameraFollower>();
 			this._cameraFollower.enabled = this.photonView.isMine;
@@ -712,6 +729,7 @@ namespace Memewars
 			PhotonNetwork.player.SetCustomProperties(new ExitGames.Client.Photon.Hashtable {
 				{ "Deaths", this._deaths }
 			});
+			// this.photonView.RPC("NetworkDeath", PhotonTargets.OthersBuffered, info);
 		}
 
 		[PunRPC]

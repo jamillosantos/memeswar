@@ -17,6 +17,8 @@ public class Bar : MonoBehaviour
 
 	private Text _text;
 
+	private Vector2 _sizeTarget;
+
 	public float Current
 	{
 		get
@@ -27,7 +29,9 @@ public class Bar : MonoBehaviour
 		{
 			this._current = value;
 			float ratio = Mathf.Clamp((this._current - this.Min) / (this.Max - this.Min), 0f, 1f);
-			this._image.rectTransform.sizeDelta = new Vector2(this._backgroundImage.rectTransform.rect.width * ratio, this._backgroundImage.rectTransform.rect.height);
+
+			this._sizeTarget = new Vector2(this._backgroundImage.rectTransform.rect.width * ratio, this._backgroundImage.rectTransform.rect.height);
+			this._image.rectTransform.sizeDelta = this._sizeTarget;
 			// this._image.color = this.Gradient.Evaluate(ratio);
 			if (this._text)
 				this._text.text = Mathf.Round(this._current).ToString();
@@ -50,6 +54,7 @@ public class Bar : MonoBehaviour
 					break;
 			}
 		}
+		this._sizeTarget = this._image.rectTransform.sizeDelta;
 		this.Current = this.Max;
 	}
 }
