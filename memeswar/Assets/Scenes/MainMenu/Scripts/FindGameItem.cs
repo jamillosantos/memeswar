@@ -12,7 +12,8 @@ public class FindGameItem : MonoBehaviour
 
 	public void JoinClick()
 	{
-		Debug.Log("Clicou no join!!!" + this.Name.text);
+		PhotonNetwork.JoinRoom(this.Name.text);
+		Application.LoadLevel("RuaEscura");
 	}
 
 }
