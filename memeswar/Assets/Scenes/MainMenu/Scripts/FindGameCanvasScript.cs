@@ -34,7 +34,7 @@ public class FindGameCanvasScript : MonoBehaviour
 
 	void Add(string name, int players, int maxPlayers)
 	{
-		GameObject tmp = (GameObject)Instantiate(this._gameItemOriginal, new Vector3(60, (this._list.Count - 1) * 36), Quaternion.identity);
+		GameObject tmp = (GameObject)Instantiate(this._gameItemOriginal, new Vector3(0, (this._list.Count - 1) * 36), Quaternion.identity);
 		this._list.Add(tmp);
 		tmp.transform.SetParent(this.ListContainer.transform, false);
 		FindGameItem item = tmp.GetComponent<FindGameItem>();

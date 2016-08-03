@@ -13,25 +13,36 @@ public class MainMenuScript : MonoBehaviour
 
 	public Button Quit;
 
+	private Canvas _canvas;
+
 	public Canvas QuitGameConfirmationCanvas;
 
 	public Canvas FindGameCanvas;
 
 	void Start()
 	{
+		this._canvas = this.GetComponent<Canvas>();
 		this.QuitGameConfirmationCanvas.enabled = false;
 		this.FindGameCanvas.gameObject.SetActive(false);
 	}
 
 	public void FindGameClick()
 	{
-		this.gameObject.SetActive(false);
-		this.FindGameCanvas.gameObject.SetActive(true);
+		if (PhotonNetwork.connected)
+		{
+			this.gameObject.SetActive(false);
+			this.FindGameCanvas.gameObject.SetActive(true);
+		}
+		else
+		{
+			FlashMessage.Popup(this._canvas.transform, "Ei aperriado, espera conectar aí.", 5);
+		}
 	}
 
 	public void CreateGameClick()
 	{
-		//
+		Debug.Log("CreateGameClick");
+		FlashMessage.Popup(this._canvas.transform, "@TODO!", 3);
 	}
 
 	public void SettingsClick()
