@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using Memewars;
-using System;
 
 class Part
 {
@@ -18,11 +16,26 @@ public class RagdollController : MonoBehaviour
 
 	private float _disableAt;
 
+	void FindParts()
+	{
+		Transform[] transformations = this.GetComponentsInChildren<Transform>();
+		Part tmp;
+		Rigidbody tmpRigidbody;
+		foreach (Transform t in transformations)
+		{
+			if (t.gameObject.name.EndsWith("_Hips"))
+				this._hipsRigidbody = t.gameObject.GetComponent<Rigidbody>();
+		}
+		if (this._hipsRigidbody == null)
+			throw new System.Exception("Cannot find Hips on the Ragdoll");
+	}
+
 	void Update()
 	{
-		this._cameraFollower.enabled = (this._disableAt > Time.timeSinceLevelLoad);
+		if (this._cameraFollower != null)
+			this._cameraFollower.enabled = (this._disableAt > Time.timeSinceLevelLoad);
 	}
-	
+
 	public void Mimic(StickmanCharacter stickmanCharacter)
 	{
 		this._cameraFollower = this.GetComponentInChildren<CameraFollower>();
@@ -35,7 +48,7 @@ public class RagdollController : MonoBehaviour
 		else
 			this._disableAt = 0;
 
-		Dictionary<string, Part> parts = new Dictionary<string, Part>();
+		System.Collections.Generic.Dictionary<string, Part> parts = new System.Collections.Generic.Dictionary<string, Part>();
 		foreach (Transform t in stickmanCharacter.Skeleton.GetComponentsInChildren<Transform>())
 		{
 			Debug.Log(t.gameObject.name);
@@ -45,14 +58,13 @@ public class RagdollController : MonoBehaviour
 				rigidbody = t.gameObject.GetComponent<Rigidbody>()
 			});
 		}
+
+		this.FindParts();
 		Transform[] transformations = this.GetComponentsInChildren<Transform>();
 		Part tmp;
 		Rigidbody tmpRigidbody;
 		foreach (Transform t in transformations)
 		{
-			if (t.gameObject.name.EndsWith("_Hips"))
-				this._hipsRigidbody = t.gameObject.GetComponent<Rigidbody>();
-
 			if (parts.TryGetValue(t.gameObject.name, out tmp))
 			{
 				t.localPosition = tmp.transform.localPosition;
@@ -65,8 +77,7 @@ public class RagdollController : MonoBehaviour
 				}
 			}
 		}
-		if (this._hipsRigidbody == null)
-			throw new Exception("Cannot find Hips on the Ragdoll");
+
 
 		float massRatio = (this._hipsRigidbody.mass / stickmanCharacter.rootRigidbody.mass);
 		this._hipsRigidbody.velocity = stickmanCharacter.rootRigidbody.velocity * massRatio;
@@ -77,5 +88,16 @@ public class RagdollController : MonoBehaviour
 		{
 			blood.transform.SetParent(this._hipsRigidbody.transform, false);
 		}		
+	}
+
+	public void Randomize()
+	{
+		this.FindParts();
+		float d = 100f;
+		Rigidbody[] rigidbodies = this.GetComponentsInChildren<Rigidbody>();
+		foreach (Rigidbody r in rigidbodies)
+		{
+			r.angularVelocity = new Vector3(Random.Range(-d, d), Random.Range(-d, d), Random.Range(-d, d));
+		}
 	}
 }

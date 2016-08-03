@@ -33,6 +33,8 @@ public class ExplosiveProjectile : Projectile
 	/// <param name="collision"></param>
 	protected override void Hit(Collision collision)
 	{
+		if (this.DefaultCollider == null)
+			return;
 		/// Desabilita colisor padrão
 		this.DefaultCollider.enabled = false;
 

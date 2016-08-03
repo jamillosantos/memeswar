@@ -52,6 +52,8 @@ public class Projectile : Photon.MonoBehaviour
 	/// <see cref="Collided" />
 	private bool _collided = false;
 
+	public bool Fake = false;
+
 	/// <summary>
 	/// Flag que guarda se o objeto já sofreu alguma colisão.
 	/// </summary>
@@ -170,9 +172,12 @@ public class Projectile : Photon.MonoBehaviour
 		else
 			this.gameObject.layer = Layer.Bullets;
 
-		this._stickmanCharacter = Players.Get(this.photonView.owner);
-		this._weapon = this._stickmanCharacter.Weapon;
-		this.Fire((Vector3)this.photonView.instantiationData[0]);
+		if (!this.Fake)
+		{
+			this._stickmanCharacter = Players.Get(this.photonView.owner);
+			this._weapon = this._stickmanCharacter.Weapon;
+			this.Fire((Vector3)this.photonView.instantiationData[0]);
+		}
 	}
 
 	protected virtual void Update()

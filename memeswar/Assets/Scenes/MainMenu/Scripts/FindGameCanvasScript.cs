@@ -16,10 +16,18 @@ public class FindGameCanvasScript : MonoBehaviour
 
 	void OnEnable()
 	{
-		this._canvas = this.GetComponent<Canvas>();
+		this.RefreshRooms();
+	}
+
+	public void RefreshRooms()
+	{
+		if (this._canvas == null)
+		{ 
+			this._canvas = this.GetComponent<Canvas>();
+			this._list = new List<GameObject>();
+			this._gameItemOriginal = Resources.Load("FindGameItem");
+		}
 		this._canvas.enabled = true;
-		this._list = new List<GameObject>();
-		this._gameItemOriginal = Resources.Load("FindGameItem");
 
 		FindGameItem[] items = this.GetComponentsInChildren<FindGameItem>();
 		foreach (FindGameItem item in items)
