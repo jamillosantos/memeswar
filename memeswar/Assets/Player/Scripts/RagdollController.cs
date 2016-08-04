@@ -19,8 +19,6 @@ public class RagdollController : MonoBehaviour
 	void FindParts()
 	{
 		Transform[] transformations = this.GetComponentsInChildren<Transform>();
-		Part tmp;
-		Rigidbody tmpRigidbody;
 		foreach (Transform t in transformations)
 		{
 			if (t.gameObject.name.EndsWith("_Hips"))

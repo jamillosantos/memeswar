@@ -6,9 +6,11 @@ public class FindGameCanvasScript : MonoBehaviour
 
 	private Canvas _canvas;
 
+	public Canvas Main;
+
 	private List<GameObject> _list;
 
-	public UnityEngine.Object _gameItemOriginal;
+	private UnityEngine.Object _gameItemOriginal;
 
 	public GameObject ListContainer;
 
@@ -49,5 +51,11 @@ public class FindGameCanvasScript : MonoBehaviour
 		item.Name.text = name;
 		item.Players.text = players.ToString();
 		item.MaxPlayers.text = maxPlayers.ToString();
+	}
+
+	public void ReturnToMain()
+	{
+		this.Main.gameObject.SetActive(true);
+		this.gameObject.SetActive(false);
 	}
 }

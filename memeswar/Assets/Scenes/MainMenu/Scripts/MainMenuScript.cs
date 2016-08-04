@@ -19,11 +19,14 @@ public class MainMenuScript : MonoBehaviour
 
 	public Canvas FindGameCanvas;
 
+	public Canvas CreateGameCanvas;
+
 	void Start()
 	{
 		this._canvas = this.GetComponent<Canvas>();
 		this.QuitGameConfirmationCanvas.enabled = false;
 		this.FindGameCanvas.gameObject.SetActive(false);
+		this.CreateGameCanvas.gameObject.SetActive(false);
 	}
 
 	public void FindGameClick()
@@ -41,8 +44,8 @@ public class MainMenuScript : MonoBehaviour
 
 	public void CreateGameClick()
 	{
-		Debug.Log("CreateGameClick");
-		FlashMessage.Popup(this._canvas.transform, "@TODO!", 3);
+		this.CreateGameCanvas.gameObject.SetActive(true);
+		this.gameObject.SetActive(false);
 	}
 
 	public void SettingsClick()

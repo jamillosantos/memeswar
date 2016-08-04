@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class FindGameItem : MonoBehaviour
 {
@@ -13,7 +14,11 @@ public class FindGameItem : MonoBehaviour
 	public void JoinClick()
 	{
 		PhotonNetwork.JoinRoom(this.Name.text);
-		Application.LoadLevel("RuaEscura");
+		SceneManager.LoadScene("RuaEscura");
 	}
 
+	public void OnPhotonJoinRoomFailed(object[] codeAndMsg)
+	{
+		FlashMessage.Popup(this.transform, "Não foi possível entrar no jogo: " + codeAndMsg[1], 5f);
+	}
 }
