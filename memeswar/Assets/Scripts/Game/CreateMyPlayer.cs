@@ -4,8 +4,31 @@ using Memewars;
 
 public class CreateMyPlayer : MonoBehaviour
 {
+	public static string RoomToJoin;
 
 	void Start()
+	{
+		/*
+		if (PhotonNetwork.connectionState != ConnectionState.Connected)
+		{
+			PhotonNetwork.ConnectUsingSettings("v0.0");
+		}
+		else if (PhotonNetwork.connectionStateDetailed == PeerState.Joined)
+		{
+			this.CreatePlayer();
+		}
+		else
+		{
+			PhotonNetwork.JoinOrCreateRoom("Sangria Desatada", new RoomOptions(), new TypedLobby());
+		}
+		*/
+		if (!string.IsNullOrEmpty(RoomToJoin))
+			PhotonNetwork.JoinRoom(RoomToJoin);
+		else
+			this.CreatePlayer();
+	}
+
+	void OnJoinedRoom()
 	{
 		this.CreatePlayer();
 	}

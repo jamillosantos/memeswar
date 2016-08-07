@@ -13,7 +13,7 @@ public class FindGameItem : MonoBehaviour
 
 	public void JoinClick()
 	{
-		PhotonNetwork.JoinRoom(this.Name.text);
+		CreateMyPlayer.RoomToJoin = this.Name.text;
 		SceneManager.LoadScene("RuaEscura");
 	}
 
