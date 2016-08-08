@@ -5,7 +5,9 @@ using System.Collections.Generic;
 
 namespace Memewars
 {
-
+	/// <summary>
+	/// Classe ajudante para manipulação dos PohtonPlayers.
+	/// </summary>
 	public class Players
 	{
 		static Dictionary<int, StickmanCharacter> players = new Dictionary<int, StickmanCharacter>();
@@ -21,6 +23,10 @@ namespace Memewars
 		}
 	}
 
+
+	/// <summary>
+	/// Abstração do personagem.
+	/// </summary>
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
@@ -53,6 +59,9 @@ namespace Memewars
 
 		private int _deaths = 0;
 
+		/// <summary>
+		/// Quantidade de mortes de cada jogador (sofridas).
+		/// </summary>
 		public int Deaths
 		{
 			get
@@ -67,6 +76,9 @@ namespace Memewars
 
 		private int _kills = 0;
 
+		/// <summary>
+		/// Quantidade de assasinatos de cada jogador (cometidos).
+		/// </summary>
 		public int Kills
 		{
 			get
@@ -77,6 +89,9 @@ namespace Memewars
 
 		private float _lastKillAt;
 
+		/// <summary>
+		/// Momento da última morte do jogador para utilização no sistema de "feitos".
+		/// </summary>
 		public float LastKillAt
 		{
 			get
@@ -85,6 +100,9 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Tempo decorrido da última morte.
+		/// </summary>
 		public float TimeSinceLastKill
 		{
 			get
@@ -95,16 +113,25 @@ namespace Memewars
 
 		public float MaxHorizontalSpeed = 7f;
 
+		/// <summary>
+		/// Força do pulo.
+		/// ( padrão do script do unity)
+		/// </summary>
 		[SerializeField]
 		float _jumpPower = 9f;
 
+		/// ( padrão do script do unity)
 		[Range(1f, 4f)]
 		[SerializeField]
 		float _runCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
 
+		/// ( padrão do script do unity)
 		[SerializeField]
 		float _groundCheckDistance = 0.1f;
 
+		/// <summary>
+		/// Função que replica a ragdoll na posição do jogador.
+		/// </summary>
 		public void Ragdoll()
 		{
 			UnityEngine.Object obj = Resources.Load("Ragdoll");
@@ -172,9 +199,29 @@ namespace Memewars
 		private float _jetpackReloadRatio;
 
 		private bool _started = false;
+
+		/// <summary>
+		/// Posição cache vinda da network.
+		/// <see cref="OnPhotonSerializeView(PhotonStream, PhotonMessageInfo)"/>
+		/// </summary>
 		private Vector3 _updatedPosition;
+
+		/// <summary>
+		/// Rotação cache vinda da network.
+		/// <see cref="OnPhotonSerializeView(PhotonStream, PhotonMessageInfo)"/>
+		/// </summary>
 		private Quaternion _updatedRotation;
+
+		/// <summary>
+		/// Velocidade cache vinda da network.
+		/// <see cref="OnPhotonSerializeView(PhotonStream, PhotonMessageInfo)"/>
+		/// </summary>
 		private Vector3 _updatedVelocity;
+
+		/// <summary>
+		/// Diração da mira cache vinda da network.
+		/// <see cref="OnPhotonSerializeView(PhotonStream, PhotonMessageInfo)"/>
+		/// </summary>
 		private Vector3 _updatedAimDirection;
 
 		private Bar _jetpackUIBar;
@@ -420,6 +467,9 @@ namespace Memewars
 
 		private SkeletonReference _skeletonReference;
 
+		/// <summary>
+		/// Referência do esqueleto.
+		/// </summary>
 		public SkeletonReference Skeleton
 		{
 			get
@@ -428,10 +478,16 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Cache do componente que cuida dos danos do personagem.
+		/// </summary>
 		private CharacterDamageable _damageable;
 
 		private bool _dead = false;
 
+		/// <summary>
+		/// Controlador de música.
+		/// </summary>
 		private MusicController _musicController;
 
 		/// <summary>
@@ -543,6 +599,9 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Retorna se o jogador está olhando para a esquerda ou direita, dependendo da posição do mouse em relação a camera.
+		/// </summary>
 		protected bool IsFacingRight
 		{
 			get
@@ -571,6 +630,9 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Retorna o ângulo da mira.
+		/// </summary>
 		public float AimAngle
 		{
 			get
@@ -579,6 +641,9 @@ namespace Memewars
 			}
 		}
 
+		/// <summary>
+		/// Atualiza para que lado o jogador está olhando.
+		/// </summary>
 		protected void UpdateRotation()
 		{
 			this.transform.rotation = Quaternion.Euler(0, 90 * (this.IsFacingRight ? 1f : -1f), 0);

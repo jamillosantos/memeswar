@@ -212,8 +212,8 @@ public class Gun
 	{
 		return
 			trigger.Pulled
-			&& (!this.IsReloading)                                           // Não carregando
-			&& (this.Ammo > 0)                                         // Munição disponível
+			&& (!this.IsReloading)                                      // Não carregando
+			&& (this.Ammo > 0)                                          // Munição disponível
 			&& (trigger.PulledElapsed >= trigger.TimePrepareFirstShot)	// Tempo de preparação já ocorrido
 			&& (this.LastShotElapsed >= trigger.TimeBetweenShots);      // Entre o último tiro e este já passou tempo suficiente
 	}

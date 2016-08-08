@@ -7,7 +7,7 @@ public class RocketLauncher
 	public RocketLauncher()
 		: base()
 	{
-		this.GunTrigger1.TimeBetweenShots = 0.7f;
-		this.GunTrigger2.TimeBetweenShots = 0.7f;
+		this.GunTrigger1.TimeBetweenShots = 2f;
+		this.GunTrigger2.TimeBetweenShots = 2f;
 	}
 }

@@ -9,7 +9,7 @@ public class AK47
 	public AK47()
 		: base()
 	{
-		this.GunTrigger1.TimeBetweenShots = 0.1f;
-		this.GunTrigger2.TimeBetweenShots = 0.1f;
+		this.GunTrigger1.TimeBetweenShots = 0.15f;
+		this.GunTrigger2.TimeBetweenShots = 0.15f;
 	}
 }

@@ -34,6 +34,10 @@ public class RagdollController : MonoBehaviour
 			this._cameraFollower.enabled = (this._disableAt > Time.timeSinceLevelLoad);
 	}
 
+	/// <summary>
+	/// Pega todas as juntas do jogador e aplica a esta ragdoll.
+	/// </summary>
+	/// <param name="stickmanCharacter"></param>
 	public void Mimic(StickmanCharacter stickmanCharacter)
 	{
 		this._cameraFollower = this.GetComponentInChildren<CameraFollower>();

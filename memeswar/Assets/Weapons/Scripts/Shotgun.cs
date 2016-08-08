@@ -10,8 +10,8 @@ public class Shotgun
 	public Shotgun()
 		: base()
 	{
-		this.GunTrigger1.TimeBetweenShots = 0.4f;
-		this.GunTrigger2.TimeBetweenShots = 0.4f;
+		this.GunTrigger1.TimeBetweenShots = 1.4f;
+		this.GunTrigger2.TimeBetweenShots = 1.4f;
 	}
 
 	protected override void TriggerCreateProjectile1()
