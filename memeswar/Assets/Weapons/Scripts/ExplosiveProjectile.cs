@@ -35,37 +35,59 @@ public class ExplosiveProjectile : Projectile
 	{
 		if (this.DefaultCollider == null)
 			return;
-		/// Desabilita colisor padrão
-		this.DefaultCollider.enabled = false;
 
-		/// Desabilita o renderer para que o projétil não seja mais exibido.
-		this.DefaultRenderer.enabled = false;
-
-		/// Colliders atingidos na área da explosão.
-		Collider[] colliders = Physics.OverlapSphere(this.transform.position, this.Radius);
-
-		/// Vê o ponto mais próximo do objeto na explosão e usa esse dado para computar a distância
-		/// para assim aplicar o dano.
-		Vector3 contactPoint, normal;
-		float d;
-		Damageable damageable;
-		foreach (Collider c in colliders)
+		if (!this.photonView.isMine)
 		{
-			damageable = c.GetComponent<Damageable>();
-			if (damageable)
+			if (this.Fake)
 			{
-				contactPoint = c.ClosestPointOnBounds(this.transform.position);
-				d = Vector3.Distance(contactPoint, this.transform.position);
-				normal = (this.transform.position - contactPoint);
-				normal.Normalize();
-				damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))), new CollisionInfo(this.StickmanCharacter, this.Weapon, contactPoint, normal));
+				if (this.ExplosionEffect)
+				{
+					UnityStandardAssets.Effects.ExplosionPhysicsForce explosion = ((GameObject)Instantiate(this.ExplosionEffect, this.transform.position, Quaternion.identity)).GetComponent<UnityStandardAssets.Effects.ExplosionPhysicsForce>();
+					explosion.Radius = this.Radius;
+				}
+				Destroy(this.gameObject);
+			}
+			else
+			{
+				/// Desabilita colisor padrão
+				this.DefaultCollider.enabled = false;
+
+				/// Desabilita o renderer para que o projétil não seja mais exibido.
+				this.DefaultRenderer.enabled = false;
+
+				/// Colliders atingidos na área da explosão.
+				Collider[] colliders = Physics.OverlapSphere(this.transform.position, this.Radius);
+
+				/// Vê o ponto mais próximo do objeto na explosão e usa esse dado para computar a distância
+				/// para assim aplicar o dano.
+				Vector3 contactPoint, normal;
+				float d;
+				Damageable damageable;
+				foreach (Collider c in colliders)
+				{
+					damageable = c.GetComponent<Damageable>();
+					if (damageable)
+					{
+						contactPoint = c.ClosestPointOnBounds(this.transform.position);
+						d = Vector3.Distance(contactPoint, this.transform.position);
+						normal = (this.transform.position - contactPoint);
+						normal.Normalize();
+						damageable.Damage(Mathf.Ceil(this.Damage * (1 - (Mathf.Max((d - this.CoreRadius), 0) / this.Radius))), new CollisionInfo(this.StickmanCharacter, this.Weapon, contactPoint, normal));
+					}
+				}
 			}
 		}
+		this.photonView.RPC("DestroyProjectile", PhotonTargets.All, collision.contacts[0].point);
+	}
+
+	[PunRPC]
+	protected override void DestroyProjectile(Vector3 point)
+	{
 		if (this.ExplosionEffect)
 		{
 			UnityStandardAssets.Effects.ExplosionPhysicsForce explosion = ((GameObject)Instantiate(this.ExplosionEffect, this.transform.position, Quaternion.identity)).GetComponent<UnityStandardAssets.Effects.ExplosionPhysicsForce>();
 			explosion.Radius = this.Radius;
 		}
-		Destroy(this.gameObject);
+		base.DestroyProjectile(point);
 	}
 }

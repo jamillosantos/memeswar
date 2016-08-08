@@ -53,7 +53,6 @@ public class RagdollController : MonoBehaviour
 		System.Collections.Generic.Dictionary<string, Part> parts = new System.Collections.Generic.Dictionary<string, Part>();
 		foreach (Transform t in stickmanCharacter.Skeleton.GetComponentsInChildren<Transform>())
 		{
-			Debug.Log(t.gameObject.name);
 			parts.Add(t.gameObject.name, new Part()
 			{
 				transform = t,

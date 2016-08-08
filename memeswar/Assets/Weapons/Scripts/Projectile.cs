@@ -224,12 +224,13 @@ public class Projectile : Photon.MonoBehaviour
 					 this.ApplyDamage(contact, damageable);
 			}
 		}
-		this.photonView.RPC("DestroyProjectile", PhotonTargets.AllBuffered, collision.contacts[0].point);
+		this.photonView.RPC("DestroyProjectile", PhotonTargets.All, collision.contacts[0].point);
 	}
 
 	private void DestroyVisualEffect(Vector3 point)
 	{
-		Instantiate(this.CollisionFX, point, Quaternion.identity);
+		if (this.CollisionFX != null)
+			Instantiate(this.CollisionFX, point, Quaternion.identity);
 	}
 
 	/// <summary>

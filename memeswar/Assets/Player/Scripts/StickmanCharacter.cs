@@ -30,6 +30,8 @@ namespace Memewars
 	[RequireComponent(typeof(Animator))]
 	public class StickmanCharacter : Photon.MonoBehaviour
 	{
+		private Transform _hudTransform;
+
 		/// <summary>
 		/// Array que guarda as referências das armas do arsenal.
 		/// </summary>
@@ -90,7 +92,7 @@ namespace Memewars
 		private float _lastKillAt;
 
 		/// <summary>
-		/// Momento da última morte do jogador para utilização no sistema de "feitos".
+		/// Momento da última morte do jogador para utilização no sistema de "façanha".
 		/// </summary>
 		public float LastKillAt
 		{
@@ -483,7 +485,7 @@ namespace Memewars
 		/// </summary>
 		private CharacterDamageable _damageable;
 
-		private bool _dead = false;
+		private volatile bool _dead = false;
 
 		/// <summary>
 		/// Controlador de música.
@@ -495,8 +497,14 @@ namespace Memewars
 		/// </summary>
 		private AudioSource _audioSource;
 
+		/// <summary>
+		/// Guarda as mortes em sequencia.
+		/// </summary>
+		private int _killSequence = 0;
+
 		void Start()
 		{
+			this._hudTransform = GameObject.Find("HUD").GetComponent<Canvas>().transform;
 			this._audioSource = this.GetComponent<AudioSource>();
 			this._musicController = this.GetComponentInChildren<MusicController>();
 			if (this.photonView.isMine)
@@ -798,6 +806,7 @@ namespace Memewars
 		{
 			if (!this._dead)
 			{
+				this._dead = true;
 				this._cameraFollower.enabled = false;
 				this.Ragdoll();
 				this.BroadcastDeath(info);
@@ -817,14 +826,46 @@ namespace Memewars
 				{
 					Debug.Log(this + " was killed by " + info.Assassin);
 					info.Assassin.photonView.owner.AddScore(1);
+					info.Assassin.photonView.RPC("YouKilled", info.Assassin.photonView.owner, this.photonView.owner.ID);
 				}
-				this._dead = true;
 			}
+		}
+
+		/// <summary>
+		/// Método chamado quando alguém for morte por este jogador.
+		/// </summary>
+		/// <param name="playerId">Id do player assassinado.</param>
+		[PunRPC]
+		public void YouKilled(int playerId)
+		{
+			PhotonPlayer player = PhotonPlayer.Find(playerId);
+			if (this.TimeSinceLastKill < 40f)
+			{
+				this._killSequence++;
+				this.photonView.RPC("ShowAchievement", PhotonTargets.Others, new object[] {
+					this.photonView.owner.ID, this._killSequence
+				});
+			}
+			else
+			{
+				this._killSequence = 1;
+			}
+			this._lastKillAt = Time.timeSinceLevelLoad;
+		}
+
+		[PunRPC]
+		public void ShowAchievement(int playerId, int killedSequence)
+		{
+			PhotonPlayer player = PhotonPlayer.Find(playerId);
+			if (player == null)
+				FlashMessage.Popup(this._hudTransform.transform, "Algém matou " + killedSequence + " vezes em sequencia", 1f);
+			else
+				FlashMessage.Popup(this._hudTransform.transform, player.name + " matou " + killedSequence + " vezes em sequencia", 1f);
 		}
 
 		private void BroadcastDeath(DeathInfo info)
 		{
-			this.photonView.RPC("NetworkDeath", PhotonTargets.OthersBuffered);
+			this.photonView.RPC("NetworkDeath", PhotonTargets.Others);
 		}
 
 		[PunRPC]
