@@ -23,9 +23,25 @@ public class CreateMyPlayer : MonoBehaviour
 		}
 		*/
 		if (!string.IsNullOrEmpty(RoomToJoin))
+		{
 			PhotonNetwork.JoinRoom(RoomToJoin);
+		}
 		else
-			this.CreatePlayer();
+		{
+			if (PhotonNetwork.connectionState != ConnectionState.Connected)
+			{
+				PhotonNetwork.ConnectUsingSettings("v0.0");
+			}
+			else if (PhotonNetwork.connectionStateDetailed == PeerState.Joined)
+			{
+				this.CreatePlayer();
+			}
+		}
+	}
+
+	void OnJoinedLobby()
+	{
+		PhotonNetwork.JoinOrCreateRoom("Sangria Desatada", new RoomOptions(), new TypedLobby());
 	}
 
 	void OnJoinedRoom()

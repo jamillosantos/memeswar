@@ -382,6 +382,11 @@ namespace Memewars
 					}
 					else if (this.Weapon is Gun)
 						this._ammoUIBar.Current = ((Gun)this.Weapon).Ammo;
+					
+					if (this.Weapon.Trigger1.Pulled)
+					{
+						this._musicController.StartCombat();
+					}
 				}
 			}
 		}
@@ -418,8 +423,11 @@ namespace Memewars
 
 		private bool _dead = false;
 
+		private MusicController _musicController;
+
 		void Start()
 		{
+			this._musicController = this.GetComponentInChildren<MusicController>();
 			if (this.photonView.isMine)
 				this.gameObject.layer = Layer.Myself;
 			else
