@@ -12,6 +12,7 @@ public class CollisionInfo
 
 	public Vector3 Normal;
 
+
 	public CollisionInfo(ContactPoint contactPoint)
 	{
 		this.Point = contactPoint.point;
@@ -48,6 +49,8 @@ public class Projectile : Photon.MonoBehaviour
 	/// Velocidade do disparo.
 	/// </summary>
 	public float Speed;
+
+	public AudioClip AudioSdx;
 
 	/// <see cref="Collided" />
 	private bool _collided = false;
@@ -164,8 +167,7 @@ public class Projectile : Photon.MonoBehaviour
 	{
 		this._defaultRenderer = this.GetComponent<Renderer>();
 		Collider[] colliders = this.GetComponents<Collider>();
-//		foreach (Collider c in colliders)
-//			c.enabled = this.photonView.isMine;
+
 		this._defaultCollider = colliders[0];
 		if (this.photonView.isMine)
 			this.gameObject.layer = Layer.BulletsMyself;
@@ -175,6 +177,7 @@ public class Projectile : Photon.MonoBehaviour
 		if (!this.Fake)
 		{
 			this._stickmanCharacter = Players.Get(this.photonView.owner);
+			this._stickmanCharacter.PlayOneShot(this.AudioSdx);
 			this._weapon = this._stickmanCharacter.Weapon;
 			this.Fire((Vector3)this.photonView.instantiationData[0]);
 		}

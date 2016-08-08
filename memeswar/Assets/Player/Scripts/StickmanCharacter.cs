@@ -153,6 +153,15 @@ namespace Memewars
 		private float _jetpackReloadDuration = 5f;
 
 		/// <summary>
+		/// Reproduz um som. Usado para o som das armas.
+		/// </summary>
+		/// <param name="audioSdx">Clip que será reproduzido.</param>
+		public void PlayOneShot(AudioClip audioSdx)
+		{
+			this._audioSource.PlayOneShot(audioSdx);
+		}
+
+		/// <summary>
 		/// Valor atual do combustível do jetpack.
 		/// </summary>
 		private float _jetpackFuel;
@@ -425,8 +434,14 @@ namespace Memewars
 
 		private MusicController _musicController;
 
+		/// <summary>
+		/// Audio que tocará os efeitos dos tiros.
+		/// </summary>
+		private AudioSource _audioSource;
+
 		void Start()
 		{
+			this._audioSource = this.GetComponent<AudioSource>();
 			this._musicController = this.GetComponentInChildren<MusicController>();
 			if (this.photonView.isMine)
 				this.gameObject.layer = Layer.Myself;

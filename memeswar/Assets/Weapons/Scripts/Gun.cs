@@ -3,7 +3,8 @@ using System;
 using UnityEngine;
 
 
-public class Gun : Weapon
+public class Gun
+	: Weapon
 {
 	/// <summary>
 	/// Carga atual de munição na arma, em unidades.
