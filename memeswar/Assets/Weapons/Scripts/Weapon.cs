@@ -10,6 +10,9 @@ using System;
 public abstract class Weapon : MonoBehaviour
 {
 
+	/// <summary>
+	/// Enum que guarda uma lista das armas.
+	/// </summary>
 	public enum Weapons
 	{
 		[Description("AK47")]
@@ -49,6 +52,9 @@ public abstract class Weapon : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Tempo, em segundos, passados desde que o processo de reloading foi iniciado.
+	/// </summary>
 	public float ReloadingElapsed
 	{
 		get
@@ -62,6 +68,9 @@ public abstract class Weapon : MonoBehaviour
 		this._stickmanCharacter = this.GetComponentInParent<StickmanCharacter>();
 	}
 
+	/// <summary>
+	/// Referência do player que está controlando esta arma.
+	/// </summary>
 	protected StickmanCharacter StickmanCharacter
 	{
 		get
@@ -88,6 +97,9 @@ public abstract class Weapon : MonoBehaviour
 		return new Trigger();
 	}
 
+	/// <summary>
+	/// Inicializa os gatilhos.
+	/// </summary>
 	public Weapon()
 	{
 		this._trigger1 = this.CreateTrigger1();
@@ -144,6 +156,9 @@ public abstract class Weapon : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Método chamado no momento do tiro, ideal para criar muzzle effects quando um tiro for acionado.
+	/// </summary>
 	public virtual void VisualFireEffect()
 	{ }
 }

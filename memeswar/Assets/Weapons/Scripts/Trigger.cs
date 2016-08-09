@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 
+/// Representa o gatilho da arma.
 /// </summary>
 public class Trigger
 {
@@ -10,6 +10,9 @@ public class Trigger
 
 	private float _pulledAt;
 
+	/// <summary>
+	/// Puxa o gatilho da arma.
+	/// </summary>
 	public void Pull()
 	{
 		if (!this._pulled)
@@ -19,11 +22,17 @@ public class Trigger
 		}
 	}
 
+	/// <summary>
+	/// Solta o gatilho da arma.
+	/// </summary>
 	public void Release()
 	{
 		this._pulled = false;
 	}
 
+	/// <summary>
+	/// Guarda a informação de quando o gatilho da arma foi pressionado.
+	/// </summary>
 	public float PulledAt
 	{
 		get
@@ -32,6 +41,9 @@ public class Trigger
 		}
 	}
 
+	/// <summary>
+	/// Tempo, em segundos, passados a partir do momento em que o gatilho da arma foi pressionado.
+	/// </summary>
 	public float PulledElapsed
 	{
 		get
@@ -40,6 +52,9 @@ public class Trigger
 		}
 	}
 
+	/// <summary>
+	/// Se o gatilho foi pressionado ou não.
+	/// </summary>
 	public bool Pulled
 	{
 		get

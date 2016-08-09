@@ -3,6 +3,10 @@ using System;
 using UnityEngine;
 
 
+/// <summary>
+/// Especialização da classe `Weapon` para armas de fogo.
+/// </summary>
+/// <see cref="Weapon"/>
 public class Gun
 	: Weapon
 {
@@ -79,11 +83,13 @@ public class Gun
 	/// </summary>
 	public ParticleSystem MuzzleParticleSystem;
 
+	/// <see cref="Weapon.CreateTrigger1"/>
 	protected override Trigger CreateTrigger1()
 	{
 		return new GunTrigger();
 	}
 
+	/// <see cref="Weapon.CreateTrigger2"/>
 	protected override Trigger CreateTrigger2()
 	{
 		return new GunTrigger();
@@ -126,11 +132,16 @@ public class Gun
 	/// </summary>
 	public virtual void CreateProjectile1(Vector3[] directions, Vector3[] positions)
 	{
+		/// Aplica a força do refugo da arma (no chão e no ar)
 		if (this.StickmanCharacter.IsGrounded)
 			this.StickmanCharacter.rootRigidbody.velocity += (this.StickmanCharacter.AimDirection * -1 * this.GroundedRecoilForce);
 		else
 			this.StickmanCharacter.rootRigidbody.velocity += (this.StickmanCharacter.AimDirection * -1 * this.AirRecoilForce);
+
 		this.VisualFireEffect();
+		/// Cria os diversos tiros nas direções informadas.
+		/// Os tiros serão criados via rede.
+		/// Normalmente o array deverá ter apenas um elemento. Salve armas estilo a shotgun.
 		for (uint i = 0; i < directions.Length; i++)
 		{
 			GameObject bullet = PhotonNetwork.Instantiate(this.BulletPrefab.name, positions[i], Quaternion.identity, 0, new object[] {
@@ -144,7 +155,7 @@ public class Gun
 	/// </summary>
 	protected virtual void CreateProjectile2(Vector3 direction, Vector3 position)
 	{
-		/// TODO Implement this
+		/// Implementação ficou de fora.
 	}
 
 	/// <summary>
@@ -178,12 +189,13 @@ public class Gun
 	}
 
 	/// <summary>
-	/// Verifica os triggers e dispara os métodos `Fire` correspondente.
+	/// Verifica os triggers e dispara os métodos `Fire` correspondente dependendo das condições de tiro da arma.
 	/// </summary>
 	public virtual void Update()
 	{
 		if (this.IsReloading)
 		{
+			/// Se o processo de reloading foi concluido.
 			if (this.ReloadingElapsed >= this.ReloadTime)
 			{
 				this.Ammo = Mathf.Min(this.Ammo + this.ReloadAmount, this.CartridgeSize);
@@ -192,10 +204,12 @@ public class Gun
 		}
 		else
 		{
+			// Se puder atirar com gatilho 1
 			if (this.CanFire((GunTrigger)this.Trigger1))
 			{
 				this.Fire1();
 			}
+			// Se puder atirar com gatilho 2
 			else if (this.CanFire((GunTrigger)this.Trigger2))
 			{
 				this.Fire2();
@@ -218,6 +232,9 @@ public class Gun
 			&& (this.LastShotElapsed >= trigger.TimeBetweenShots);      // Entre o último tiro e este já passou tempo suficiente
 	}
 
+	/// <summary>
+	/// Dispara o Muzzle effect da arma quando um tiro for acionado.
+	/// </summary>
 	public override void VisualFireEffect()
 	{
 		this.MuzzleParticleSystem.Play();

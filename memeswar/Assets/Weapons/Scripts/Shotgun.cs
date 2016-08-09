@@ -10,10 +10,15 @@ public class Shotgun
 	public Shotgun()
 		: base()
 	{
+		/// Ajusta o tempo de preparação entre os tiros.
 		this.GunTrigger1.TimeBetweenShots = 1.4f;
 		this.GunTrigger2.TimeBetweenShots = 1.4f;
 	}
 
+	/// <summary>
+	/// Cria múltiplos projéteis para a shotgun. (Característica muito comum das shotguns é seus tiros
+	/// terem vários estilhaços).
+	/// </summary>
 	protected override void TriggerCreateProjectile1()
 	{
 		int[] networkIds = new int[FRAGMENTS];
@@ -26,6 +31,5 @@ public class Shotgun
 			positions[i] = this.BulletSpawnPoint.transform.position;
 		}
 		this.CreateProjectile1(directions, positions);
-		// this.StickmanCharacter.photonView.RPC("CreateProjectile1", PhotonTargets.Others, networkIds, directions, positions);
 	}
 }

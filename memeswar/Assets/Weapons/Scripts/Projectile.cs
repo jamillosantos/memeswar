@@ -177,7 +177,8 @@ public class Projectile : Photon.MonoBehaviour
 		if (!this.Fake)
 		{
 			this._stickmanCharacter = Players.Get(this.photonView.owner);
-			this._stickmanCharacter.PlayOneShot(this.AudioSdx);
+			if (!this.Fake)
+				this._stickmanCharacter.PlayOneShot(this.AudioSdx);
 			this._weapon = this._stickmanCharacter.Weapon;
 			this.Fire((Vector3)this.photonView.instantiationData[0]);
 		}
@@ -259,7 +260,9 @@ public class Projectile : Photon.MonoBehaviour
 }
 
 /// <summary>
+/// Trajetória base para implementação dos tipos de trajetória do sistema.
 /// 
+/// Dependendo do tipo de projétil, o asset do projétil terá um script de trajetória relacionado a ele.
 /// </summary>
 public class ProjectileTrajectory : MonoBehaviour
 {

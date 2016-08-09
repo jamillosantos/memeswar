@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Especialização do gatilho para armas de fogo.
+/// </summary>
 public class GunTrigger : Trigger
 {
 	/// <summary>
