@@ -2,6 +2,9 @@
 using System.Collections;
 using Memewars;
 
+/// <summary>
+/// Faz a camera principal seguir o objeto em que ela está anexado.
+/// </summary>
 public class CameraFollower : MonoBehaviour
 {
 	private Vector3 _relCameraPos;

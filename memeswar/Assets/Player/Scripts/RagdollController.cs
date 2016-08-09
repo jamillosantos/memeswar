@@ -37,7 +37,7 @@ public class RagdollController : MonoBehaviour
 	/// <summary>
 	/// Pega todas as juntas do jogador e aplica a esta ragdoll.
 	/// </summary>
-	/// <param name="stickmanCharacter"></param>
+	/// <param name="stickmanCharacter">Jogador de onde a posição deve ser copiada.</param>
 	public void Mimic(StickmanCharacter stickmanCharacter)
 	{
 		this._cameraFollower = this.GetComponentInChildren<CameraFollower>();
@@ -91,6 +91,9 @@ public class RagdollController : MonoBehaviour
 		}		
 	}
 
+	/// <summary>
+	/// Randomiza a velocidade angular de cada parte do corpo.
+	/// </summary>
 	public void Randomize()
 	{
 		this.FindParts();

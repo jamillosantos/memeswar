@@ -2,7 +2,11 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class FlashMessage : MonoBehaviour {
+/// <summary>
+/// Classe que representa as mensagens temporárias do sistema na tela.
+/// </summary>
+public class FlashMessage : MonoBehaviour
+{
 
 	static UnityEngine.Object _original;
 
@@ -10,6 +14,13 @@ public class FlashMessage : MonoBehaviour {
 
 	public string Text;
 
+	/// <summary>
+	/// Exibe uma mensagem temporária na tela.
+	/// </summary>
+	/// <param name="parent">Transform onde a mensagem deverá ser exibida.</param>
+	/// <param name="text">Texto que será apresentado.</param>
+	/// <param name="duration">Duração, em segundos, da mensagem na tela.</param>
+	/// <returns></returns>
 	public static FlashMessage Popup(Transform parent, string text, float duration)
 	{
 		if (_original == null)

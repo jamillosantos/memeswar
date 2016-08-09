@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Referência dos códigos das layers.
+/// </summary>
 public class Layer
 {
 	public const int Mouse = 8;

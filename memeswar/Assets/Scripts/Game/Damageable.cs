@@ -2,6 +2,9 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// Script que implementa a ideia de um obeto danificável, utilizado em jogadores.
+/// </summary>
 public class Damageable : MonoBehaviour
 {
 	/// <summary>

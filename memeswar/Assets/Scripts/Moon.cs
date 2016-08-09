@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Script helper para exibição da lua.
+/// </summary>
 public class Moon : MonoBehaviour
 {
 

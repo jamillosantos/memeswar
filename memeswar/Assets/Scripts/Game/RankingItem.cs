@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/// <summary>
+/// Classe que representa um item no ranking.
+/// </summary>
 public class RankingItem : MonoBehaviour
 {
 	private Text _index;
@@ -70,7 +73,6 @@ public class RankingItem : MonoBehaviour
 		}
 	}
 
-	// Use this for initialization
 	void Start ()
 	{
 		this._rectTransform = this.GetComponent<RectTransform>();
@@ -82,6 +84,9 @@ public class RankingItem : MonoBehaviour
 		this.Apply();
 	}
 
+	/// <summary>
+	/// Joga os dados da classe na interface.
+	/// </summary>
 	public void Apply()
 	{ 
 		this._rectTransform.anchoredPosition = new Vector3(60, -170 - (35 * this._indexValue));

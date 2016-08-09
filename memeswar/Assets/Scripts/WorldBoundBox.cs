@@ -2,6 +2,10 @@
 using System.Collections;
 using System;
 
+
+/// <summary>
+/// Script extensão do unity que cria uma borda no mundo para limitar a movimentação dos jogadores, e projéteis.
+/// </summary>
 public class WorldBoundBox : MonoBehaviour
 {
 	private const int TOP = 0;
@@ -27,6 +31,9 @@ public class WorldBoundBox : MonoBehaviour
 		this.applyTrans();
 	}
 
+	/// <summary>
+	/// Altera a posição das "paredes".
+	/// </summary>
 	private void applyTrans()
 	{
 		if (this._walls != null)
@@ -45,18 +52,27 @@ public class WorldBoundBox : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Evento chamado apenas enquanto no editor para exibir visualmente as paredes enquanto desenvolvendo.
+	/// </summary>
 	void OnDrawGizmos()
 	{
 		Gizmos.color = Color.gray;
 		this.drawGizmos();
 	}
 
+	/// <summary>
+	/// Evento chamado apenas enquanto no editor para exibir visualmente as paredes selecionadas enquanto desenvolvendo.
+	/// </summary>
 	void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.green;
 		this.drawGizmos();
 	}
 
+	/// <summary>
+	/// Desenha as paredes.
+	/// </summary>
 	private void drawGizmos()
 	{
 		Gizmos.DrawCube(this.transform.position + new Vector3(0f, -this.Height / 2f, 0f), new Vector3(this.Width, 1f, this.Depth));

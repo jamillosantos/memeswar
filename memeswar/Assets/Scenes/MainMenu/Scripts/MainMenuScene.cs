@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Script para inicializar a cena do MainMenu.
+/// </summary>
 public class MainMenuScene : MonoBehaviour
 {
 

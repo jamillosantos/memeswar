@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/// <summary>
+/// Script que cuida da atualização do status de network do jogo.
+/// </summary>
 public class NetworkTextStatus : MonoBehaviour
 {
 

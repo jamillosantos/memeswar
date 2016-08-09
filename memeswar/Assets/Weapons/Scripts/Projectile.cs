@@ -201,12 +201,12 @@ public class Projectile : Photon.MonoBehaviour
 	/// <see cref="Hit" />
 	public virtual void OnCollisionEnter(Collision collision)
 	{
-		this._collided = true;
-		this.Hit(collision);
-	}
-
-	public virtual void OnTriggerEnter(Collider other)
-	{
+		if (!this._collided)
+		{
+			this._collided = true;
+			this.Hit(collision);
+			this.hide();
+		}
 	}
 
 	/// <summary>
@@ -222,10 +222,11 @@ public class Projectile : Photon.MonoBehaviour
 			{
 				damageable = contact.otherCollider.GetComponentInParent<Damageable>();
 				if (damageable)
-					 this.ApplyDamage(contact, damageable);
+						this.ApplyDamage(contact, damageable);
 			}
+			this.photonView.RPC("DestroyProjectile", PhotonTargets.All, collision.contacts[0].point);
 		}
-		this.photonView.RPC("DestroyProjectile", PhotonTargets.All, collision.contacts[0].point);
+		this.DestroyVisualEffect(collision.contacts[0].point);
 	}
 
 	private void DestroyVisualEffect(Vector3 point)
@@ -247,13 +248,17 @@ public class Projectile : Photon.MonoBehaviour
 			damageable.Damage(this.Damage, new CollisionInfo(this.StickmanCharacter, this.Weapon, contact.point, normal));
 	}
 
+	protected virtual void hide()
+	{
+		this.gameObject.SetActive(false);
+	}
+
 	protected virtual void OnDestroy()
 	{ }
 
 	[PunRPC]
 	protected virtual void DestroyProjectile(Vector3 point)
 	{
-		this.DestroyVisualEffect(point);
 		if (this.photonView.isMine)
 			PhotonNetwork.Destroy(this.photonView);
 	}

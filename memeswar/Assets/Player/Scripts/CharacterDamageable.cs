@@ -1,16 +1,29 @@
 ﻿using Memewars;
 using UnityEngine;
 
+/// <summary>
+/// Danificável especializado para jogadores.
+/// </summary>
 public class CharacterDamageable : Damageable
 {
+	/// <summary>
+	/// Referência do stickman.
+	/// </summary>
 	private StickmanCharacter _stickman;
 
+	/// <summary>
+	/// Barra de HP
+	/// </summary>
 	private HPBar _hpBar;
 
+	/// <summary>
+	/// Recurso da fonte de sangue.
+	/// </summary>
 	static UnityEngine.Object BloodFountain;
 
 	protected override void Start()
 	{
+		/// Encontra o recurso da fonte de sangue.
 		if (BloodFountain == null)
 			BloodFountain = Resources.Load("BloodFountain");
 
@@ -27,8 +40,7 @@ public class CharacterDamageable : Damageable
 	public override void Damage(float damage, CollisionInfo collisionInfo)
 	{
 		base.Damage (damage, collisionInfo);
-		// Debug.Log("Direction: " + Quaternion.FromToRotation(transform.up, collisionInfo.Normal).eulerAngles);
-		// Debug.Log("Normal: " + collisionInfo.Normal);
+		/// Cria a fonte de sangue na posição onde levou o tiro.
 		GameObject bloodFountain = (GameObject)Instantiate(
 			BloodFountain,
 			collisionInfo.Point,

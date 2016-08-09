@@ -3,6 +3,9 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Script para controlar o main menu.
+/// </summary>
 public class MainMenuScript : MonoBehaviour
 {
 	public Button FindGame;
@@ -21,6 +24,9 @@ public class MainMenuScript : MonoBehaviour
 
 	public Canvas CreateGameCanvas;
 
+	/// <summary>
+	/// Exibe apenas o canvas correto.
+	/// </summary>
 	void Start()
 	{
 		this._canvas = this.GetComponent<Canvas>();
@@ -29,6 +35,9 @@ public class MainMenuScript : MonoBehaviour
 		this.CreateGameCanvas.gameObject.SetActive(false);
 	}
 
+	/// <summary>
+	/// Exibe a tela de busca de jogos.
+	/// </summary>
 	public void FindGameClick()
 	{
 		if (PhotonNetwork.connected)
@@ -42,6 +51,9 @@ public class MainMenuScript : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Exibe a tela de criação de jogo.
+	/// </summary>
 	public void CreateGameClick()
 	{
 		this.CreateGameCanvas.gameObject.SetActive(true);
@@ -49,21 +61,29 @@ public class MainMenuScript : MonoBehaviour
 	}
 
 	public void SettingsClick()
-	{
-		//
-	}
+	{ }
 
+
+	/// <summary>
+	/// Exibe a tela de confirmação de sair do jogo.
+	/// </summary>
 	public void QuitClick()
 	{
 		this.enabled = false;
 		this.QuitGameConfirmationCanvas.enabled = true;
 	}
 
+	/// <summary>
+	/// Fecha o jogo.
+	/// </summary>
 	public void QuitYesClick()
 	{
 		Application.Quit();
 	}
 
+	/// <summary>
+	/// Retorna a tela normal do main menu.
+	/// </summary>
 	public void QuitNoClick()
 	{
 		this.enabled = true;

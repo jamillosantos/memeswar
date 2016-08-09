@@ -1,15 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BloodFountain : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-}
+/// <summary>
+/// Referência da fonte de sangue, este script é utilizado apenas para marcação do gameobject.
+/// </summary>
+public class BloodFountain : MonoBehaviour
+{ }

@@ -3,6 +3,9 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Script que faz a animação incial do sistema.
+/// </summary>
 public class SplashScreenAnimations : MonoBehaviour 
 {
 	const float FADE_DURATION = 1f;

@@ -2,6 +2,9 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/// <summary>
+/// Controlador do jogo da HUD do jogo.
+/// </summary>
 public class GameController : MonoBehaviour
 {
 	public Canvas HUD;
@@ -16,6 +19,9 @@ public class GameController : MonoBehaviour
 
 	private static GameController _instance;
 
+	/// <summary>
+	/// Flag que controla se os controles do jogo estão ativos ou não. Caso inativa, é impossível controlar o jogador.
+	/// </summary>
 	public bool ControllersEnabled
 	{
 		get
@@ -58,6 +64,9 @@ public class GameController : MonoBehaviour
 		this._controllersEnabled = !this.Options.enabled;
 	}
 
+	/// <summary>
+	/// Método chamado pela HUD quando o jogador mudar o nome do jogador na interface.
+	/// </summary>
 	public void UpdateNickName()
 	{
 		PhotonNetwork.playerName = this.InputField.text;

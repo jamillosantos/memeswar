@@ -2,12 +2,24 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/// <summary>
+/// Implementação básica das barras da HUD.
+/// </summary>
 public class Bar : MonoBehaviour
 {
+	/// <summary>
+	/// Gradiente da barra.
+	/// </summary>
 	public Gradient Gradient;
 
+	/// <summary>
+	/// Valor mínimo.
+	/// </summary>
 	public float Min = 0;
 
+	/// <summary>
+	/// Valor máximo;
+	/// </summary>
 	public float Max = 100;
 
 	private Image _image;
@@ -19,6 +31,9 @@ public class Bar : MonoBehaviour
 
 	private Vector2 _sizeTarget;
 
+	/// <summary>
+	/// Valor atual da barra.
+	/// </summary>
 	public float Current
 	{
 		get
@@ -27,6 +42,7 @@ public class Bar : MonoBehaviour
 		}
 		set
 		{
+			/// Seta o tamanho da barra de acordo com o valor atual.
 			this._current = value;
 			float ratio = Mathf.Clamp((this._current - this.Min) / (this.Max - this.Min), 0f, 1f);
 
@@ -38,6 +54,9 @@ public class Bar : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Seta as referências iniciais do componente.
+	/// </summary>
 	void Start()
 	{
 		this._text = this.GetComponentInChildren<Text>();

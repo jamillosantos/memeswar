@@ -2,6 +2,9 @@
 using System.Collections;
 using Memewars;
 
+/// <summary>
+/// Define a área onde o corvo será acionado.
+/// </summary>
 public class CrowArea : MonoBehaviour
 {
 	void OnTriggerEnter(Collider other)

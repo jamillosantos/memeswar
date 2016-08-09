@@ -2,6 +2,9 @@
 using System.Collections;
 using Memewars;
 
+/// <summary>
+/// Classe responsável pela criação do player ao iniciar a cena. Ela cuidará de toda a parte de conexão e entrada no jogo.
+/// </summary>
 public class CreateMyPlayer : MonoBehaviour
 {
 	public static string RoomToJoin;
@@ -39,16 +42,25 @@ public class CreateMyPlayer : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Evento chamado quando o jogador entra no lobby.
+	/// </summary>
 	void OnJoinedLobby()
 	{
 		PhotonNetwork.JoinOrCreateRoom("Sangria Desatada", new RoomOptions(), new TypedLobby());
 	}
 
+	/// <summary>
+	/// Evento chamado quando o jogador entra no jogo.
+	/// </summary>
 	void OnJoinedRoom()
 	{
 		this.CreatePlayer();
 	}
 
+	/// <summary>
+	/// Efetua a criação do jogador via rede.
+	/// </summary>
 	private void CreatePlayer()
 	{
 		FlashMessage.Popup(GameObject.Find("HUD").transform, "Criando aqui!", 10f);
@@ -60,7 +72,5 @@ public class CreateMyPlayer : MonoBehaviour
 		});
 		player.GetComponent<StickmanUserControl>().enabled = true;
 		player.GetComponent<AudioListener>().enabled = true;
-
-		StickmanCharacter c = player.GetComponent<StickmanCharacter>();
 	}
 }

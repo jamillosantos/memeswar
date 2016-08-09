@@ -2,6 +2,9 @@
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// Script que cuida da atualização do status de network do jogo.
+/// </summary>
 public class NetworkImageStatus : MonoBehaviour
 {
 	public Color Success;

@@ -3,6 +3,10 @@ using System.Collections;
 using Memewars;
 using System;
 
+/// <summary>
+/// Simulação de um corvo na tela. Na verdade é apenas um quadrado. O corvo será acionado apenas quando o jogador
+/// passar em uma determinada área e o "assustar".
+/// </summary>
 public class Crow : MonoBehaviour
 {
 	private BezierCurve _curve;
@@ -23,6 +27,9 @@ public class Crow : MonoBehaviour
 		this._audioSource = this.GetComponent<AudioSource>();
 	}
 	
+	/// <summary>
+	/// Efetua a animação do corvo sobre uma linha bezier definida em `_curve`.
+	/// </summary>
 	void Update ()
 	{
 		if (this._playing)
@@ -45,6 +52,9 @@ public class Crow : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Inicia a animação.
+	/// </summary>
 	public void Play()
 	{
 		if (!this._playing)

@@ -2,7 +2,11 @@
 using System.Collections;
 using Memewars;
 
-public class DeathZone : MonoBehaviour {
+/// <summary>
+/// Zona de morte, sempre que qualquer objeto tocar nela é automaticamente destruído.
+/// </summary>
+public class DeathZone : MonoBehaviour
+{
 
 	void OnCollisionEnter(Collision collision)
 	{
