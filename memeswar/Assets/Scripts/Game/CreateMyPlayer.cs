@@ -65,7 +65,9 @@ public class CreateMyPlayer : MonoBehaviour
 	{
 		FlashMessage.Popup(GameObject.Find("HUD").transform, "Criando aqui!", 10f);
 
-		GameObject player = PhotonNetwork.Instantiate("Player", Vector3.zero + new Vector3(0, 5, 0), Quaternion.identity, 0, new object[] {
+		GameObject[] spanwpoints = GameObject.FindGameObjectsWithTag("Spawnpoint");
+
+		GameObject player = PhotonNetwork.Instantiate("Player", spanwpoints[Random.Range(0, spanwpoints.Length)].transform.position, Quaternion.identity, 0, new object[] {
 			new Weapon.Weapons[] {
 				Weapon.Weapons.AK47, Weapon.Weapons.RocketLauncher, Weapon.Weapons.Shotgun, Weapon.Weapons.AK47, Weapon.Weapons.AK47
 			}

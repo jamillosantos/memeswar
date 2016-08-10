@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 using System.Collections.Generic;
 
 namespace Memewars
@@ -504,8 +502,15 @@ namespace Memewars
 		/// </summary>
 		private int _killSequence = 0;
 
+		/// <summary>
+		/// Spawnpoints da fase.
+		/// </summary>
+		private GameObject[] _spawnPoints;
+
 		void Start()
 		{
+			this._spawnPoints = GameObject.FindGameObjectsWithTag("Spawnpoint");
+
 			/// Encontra o recurso da fonte de sangue.
 			if (BloodFountain == null)
 				BloodFountain = Resources.Load("BloodFountain");
@@ -579,15 +584,15 @@ namespace Memewars
 			if (this.JetpackOn && (!this.IsGrounded) && (Time.time >= this._jetpackTime) && (this._jetpackFuel > 0f))
 			{
 				Vector3 v = this._rootRigidbody.velocity;
-				v.y = Math.Min(v.y + 15f * Time.deltaTime, 4f);
+				v.y = Mathf.Min(v.y + 15f * Time.deltaTime, 4f);
 				this._rootRigidbody.velocity = v;
-				this._jetpackFuel = Math.Max(0f, this._jetpackFuel - Time.deltaTime);
+				this._jetpackFuel = Mathf.Max(0f, this._jetpackFuel - Time.deltaTime);
 				if (this.photonView.isMine)
 					this._jetpackUIBar.Current = this._jetpackFuel;
 			}
 			else if (!this.JetpackOn)
 			{
-				this._jetpackFuel = Math.Min(this._jetpackFuel + this._jetpackReloadRatio * Time.deltaTime, this._jetpackCapacity);
+				this._jetpackFuel = Mathf.Min(this._jetpackFuel + this._jetpackReloadRatio * Time.deltaTime, this._jetpackCapacity);
 				if (this.photonView.isMine)
 					this._jetpackUIBar.Current = this._jetpackFuel;
 			}
@@ -703,7 +708,7 @@ namespace Memewars
 		void UpdateAnimator()
 		{
 			float amount = ((this.photonView.isMine) ? this._rootRigidbody.velocity.x : this._updatedVelocity.x ) / this.MaxHorizontalSpeed;
-			this._animator.SetFloat("Forward", Math.Abs(amount), 0.1f, Time.deltaTime);
+			this._animator.SetFloat("Forward", Mathf.Abs(amount), 0.1f, Time.deltaTime);
 			// this.m_Animator.SetFloat("Turn", this.m_TurnAmount, 0.5f, Time.deltaTime);
 			// this.m_Animator.SetBool("Crouch", this.m_Crouching);
 			this._animator.SetBool("OnGround", this._isGrounded);
@@ -804,6 +809,7 @@ namespace Memewars
 			this._damageable.Reset();
 			this._cameraFollower.enabled = true;
 			this._rootRigidbody.velocity = Vector3.zero;
+			this.transform.position = this._spawnPoints[Random.Range(0, this._spawnPoints.Length)].transform.position;
 			
 			if (this.photonView.isMine)
 				this._head.SetFace(FacesManager.Die, 3);
