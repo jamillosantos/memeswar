@@ -807,7 +807,7 @@ namespace Memewars
 		{
 			this.gameObject.SetActive(true);
 			this._damageable.Reset();
-			this._cameraFollower.enabled = true;
+			this._cameraFollower.enabled = this.photonView.isMine;
 			this._rootRigidbody.velocity = Vector3.zero;
 			this.transform.position = this._spawnPoints[Random.Range(0, this._spawnPoints.Length)].transform.position;
 			
