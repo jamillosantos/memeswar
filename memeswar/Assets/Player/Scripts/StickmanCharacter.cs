@@ -824,6 +824,16 @@ namespace Memewars
 			this._cameraFollower.enabled = this.photonView.isMine;
 			this._rootRigidbody.velocity = Vector3.zero;
 			this.transform.position = this._spawnPoints[Random.Range(0, this._spawnPoints.Length)].transform.position;
+
+			Gun g;
+			foreach (Weapon w in this.Arsenal)
+			{
+				if (w is Gun)
+				{
+					g = (w as Gun);
+					g.Ammo = g.CartridgeSize;
+				}
+			}
 			
 			if (this.photonView.isMine)
 				this._head.SetFace(FacesManager.Die, 3);
@@ -867,12 +877,13 @@ namespace Memewars
 		[PunRPC]
 		public void YouKilled(int playerId)
 		{
+			/// Verifica os feitos
 			PhotonPlayer player = PhotonPlayer.Find(playerId);
-			if (this.TimeSinceLastKill < 40f)
+			if (this.TimeSinceLastKill < 10f)
 			{
 				this._killSequence++;
 
-				/// Exibe na tela o UI da façanha.
+				/// Exibe na tela o UI do feito.
 				int max = 0, i = 0;
 				bool found = false;
 				foreach (CanvasKill c in this._canvasKill)
@@ -892,6 +903,7 @@ namespace Memewars
 					this._canvasKill[max].Show();
 				}
 
+				/// Exibe o feito nos outros clientes.
 				this.photonView.RPC("ShowAchievement", PhotonTargets.Others, new object[] {
 					this.photonView.owner.ID, this._killSequence
 				});
@@ -899,6 +911,7 @@ namespace Memewars
 			}
 			else
 			{
+				/// Resseta o quantidade de mortes em sequencia
 				this._killSequence = 1;
 			}
 			this._lastKillAt = Time.timeSinceLevelLoad;
