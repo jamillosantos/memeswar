@@ -11,7 +11,7 @@ public class CameraFollower : MonoBehaviour
 
 	void Start ()
 	{
-		this._relCameraPos = new Vector3(0, 1.3f, -20f);
+		this._relCameraPos = new Vector3(0, 6.3f, -20f);
 	}
 
 	void FixedUpdate()
