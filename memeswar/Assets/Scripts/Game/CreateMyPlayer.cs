@@ -63,8 +63,6 @@ public class CreateMyPlayer : MonoBehaviour
 	/// </summary>
 	private void CreatePlayer()
 	{
-		FlashMessage.Popup(GameObject.Find("HUD").transform, "Criando aqui!", 10f);
-
 		GameObject[] spanwpoints = GameObject.FindGameObjectsWithTag("Spawnpoint");
 
 		GameObject player = PhotonNetwork.Instantiate("Player", spanwpoints[Random.Range(0, spanwpoints.Length)].transform.position, Quaternion.identity, 0, new object[] {
