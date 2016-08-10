@@ -133,8 +133,11 @@ public abstract class Weapon : MonoBehaviour
 	/// </summary>
 	public virtual void StartReloading()
 	{
-		this._reloading = true;
-		this._reloadingStartedAt = Time.time;
+		if (!this._reloading)
+		{
+			this._reloading = true;
+			this._reloadingStartedAt = Time.time;
+		}
 	}
 
 	/// <summary>

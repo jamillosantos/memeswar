@@ -32,6 +32,8 @@ namespace Memewars
 	{
 		private Transform _hudTransform;
 
+		static UnityEngine.Object BloodFountain;
+
 		/// <summary>
 		/// Array que guarda as referências das armas do arsenal.
 		/// </summary>
@@ -435,7 +437,7 @@ namespace Memewars
 						if (this.Weapon is Gun)
 						{
 							Gun g = (Gun)this.Weapon;
-							this._ammoUIBar.Current = g.Ammo + (g.ReloadAmount * (g.ReloadingElapsed / g.ReloadTime));
+							this._ammoUIBar.Current = Mathf.Min(this._ammoUIBar.Max, g.Ammo + (g.ReloadAmount * (g.ReloadingElapsed / g.ReloadTime)));
 						}
 					}
 					else if (this.Weapon is Gun)
@@ -504,6 +506,10 @@ namespace Memewars
 
 		void Start()
 		{
+			/// Encontra o recurso da fonte de sangue.
+			if (BloodFountain == null)
+				BloodFountain = Resources.Load("BloodFountain");
+
 			this._hudTransform = GameObject.Find("HUD").GetComponent<Canvas>().transform;
 			this._audioSource = this.GetComponent<AudioSource>();
 			this._musicController = this.GetComponentInChildren<MusicController>();
@@ -798,7 +804,10 @@ namespace Memewars
 			this._damageable.Reset();
 			this._cameraFollower.enabled = true;
 			this._rootRigidbody.velocity = Vector3.zero;
-			this._head.SetFace(FacesManager.Die, 3);
+			
+			if (this.photonView.isMine)
+				this._head.SetFace(FacesManager.Die, 3);
+
 			this._dead = false;
 		}
 
@@ -888,6 +897,18 @@ namespace Memewars
 				((Gun)this.Weapon).CreateProjectile1(directions, positions);
 			}
 		}
-	
+
+		public virtual void OnCollisionEnter(Collision collision)
+		{
+			if (collision.collider.GetComponent<Projectile>() != null)
+			{
+				GameObject bloodFountain = (GameObject)Instantiate(
+					BloodFountain,
+					collision.contacts[0].point,
+					Quaternion.LookRotation(collision.contacts[0].point - (Vector3.Dot(collision.contacts[0].point, collision.contacts[0].normal)) * collision.contacts[0].normal, collision.contacts[0].normal)
+				);
+				bloodFountain.transform.SetParent(this.transform, true);
+			}
+		}
 	}
 }

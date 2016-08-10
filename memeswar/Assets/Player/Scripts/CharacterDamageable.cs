@@ -40,6 +40,7 @@ public class CharacterDamageable : Damageable
 	public override void Damage(float damage, CollisionInfo collisionInfo)
 	{
 		base.Damage (damage, collisionInfo);
+		/*
 		/// Cria a fonte de sangue na posição onde levou o tiro.
 		GameObject bloodFountain = (GameObject)Instantiate(
 			BloodFountain,
@@ -47,6 +48,7 @@ public class CharacterDamageable : Damageable
 			Quaternion.LookRotation(collisionInfo.Point - (Vector3.Dot(collisionInfo.Point, collisionInfo.Normal)) * collisionInfo.Normal, collisionInfo.Normal)
 		);
 		bloodFountain.transform.SetParent(this._stickman.transform, true);
+		*/
 	}
 
 	protected override void Die(DeathInfo deathInfo)

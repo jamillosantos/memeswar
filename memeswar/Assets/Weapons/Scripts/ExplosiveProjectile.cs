@@ -42,6 +42,8 @@ public class ExplosiveProjectile : Projectile
 			{
 				UnityStandardAssets.Effects.ExplosionPhysicsForce explosion = ((GameObject)Instantiate(this.ExplosionEffect, this.transform.position, Quaternion.identity)).GetComponent<UnityStandardAssets.Effects.ExplosionPhysicsForce>();
 				explosion.Radius = this.Radius;
+				AudioSource audioSource = explosion.GetComponent<AudioSource>();
+				audioSource.enabled = (!this.Fake);
 			}
 			Destroy(this.gameObject);
 		}

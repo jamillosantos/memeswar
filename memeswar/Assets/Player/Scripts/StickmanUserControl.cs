@@ -91,7 +91,7 @@ namespace Memewars
 					isRight = Input.GetKey(KeyCode.D),
 					isLeft = Input.GetKey(KeyCode.A);
 
-				if (Input.GetKeyDown(KeyCode.R))
+				if (Input.GetKey(KeyCode.R))
 					this.StickmanCharacter.Weapon.StartReloading();
 
 				if (!(isRight && isLeft) && (isRight || isLeft))
