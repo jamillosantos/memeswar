@@ -42,6 +42,17 @@ public abstract class Weapon : MonoBehaviour
 	private float _reloadingStartedAt;
 
 	/// <summary>
+	/// Se a arma está cheia.
+	/// </summary>
+	public virtual bool IsFull
+	{
+		get
+		{
+			return false;
+		}
+	}
+
+	/// <summary>
 	/// Momento em que o processo de recarregamento foi iniciado.
 	/// </summary>
 	public float ReloadingStartedAt
@@ -133,7 +144,7 @@ public abstract class Weapon : MonoBehaviour
 	/// </summary>
 	public virtual void StartReloading()
 	{
-		if (!this._reloading)
+		if (!(this._reloading || this.IsFull))
 		{
 			this._reloading = true;
 			this._reloadingStartedAt = Time.time;

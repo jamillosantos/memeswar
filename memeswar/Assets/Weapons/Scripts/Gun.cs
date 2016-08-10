@@ -56,6 +56,14 @@ public class Gun
 		}
 	}
 
+	public override bool IsFull
+	{
+		get
+		{
+			return (this.Ammo == this.CartridgeSize);
+		}
+	}
+
 	/// <summary>
 	/// Quantos segundos se passaram a partir do último tiro dado. Esta variável será atualizada quando o processo
 	/// de reload for finalizado.
