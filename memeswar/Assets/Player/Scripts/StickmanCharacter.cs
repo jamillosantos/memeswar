@@ -854,6 +854,7 @@ namespace Memewars
 				this.photonView.RPC("ShowAchievement", PhotonTargets.Others, new object[] {
 					this.photonView.owner.ID, this._killSequence
 				});
+				this._head.SetFace(FacesManager.Win, 5);
 			}
 			else
 			{
