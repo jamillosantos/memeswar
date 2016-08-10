@@ -1,6 +1,16 @@
 ﻿using System.ComponentModel;
 using UnityEngine;
 
+public enum MemeFaces
+{
+	NotOkay,
+	FkMe,
+	Bilious,
+	LoL,
+	Unhappy,
+	Troll
+}
+
 public class FacesManager
 {
 	static Sprite _notokay;
@@ -75,7 +85,7 @@ public class FacesManager
 		}
 	}
 
-	public static Sprite Die
+	public static MemeFaces Die
 	{
 		get
 		{
@@ -83,15 +93,15 @@ public class FacesManager
 			switch (faceIndex)
 			{
 				case 0:
-					return bilious;
+					return MemeFaces.Bilious;
 				case 1:
-					return unhappy;
+					return MemeFaces.Unhappy;
 			}
-			return fkme;
+			return MemeFaces.FkMe;
 		}
 	}
 
-	public static Sprite Win
+	public static MemeFaces Win
 	{
 		get
 		{
@@ -99,13 +109,31 @@ public class FacesManager
 			switch (faceIndex)
 			{
 				case 0:
-					return troll;
+					return MemeFaces.Troll;
 				case 1:
-					return notokay;
-				case 2:
-					return lol;
+					return MemeFaces.NotOkay;
 			}
-			return fkme;
+			return MemeFaces.LoL;
 		}
+	}
+
+	public static Sprite GetSprite(MemeFaces face)
+	{
+		switch (face)
+		{
+			case MemeFaces.Bilious:
+				return bilious;
+			case MemeFaces.FkMe:
+				return fkme;
+			case MemeFaces.LoL:
+				return lol;
+			case MemeFaces.NotOkay:
+				return notokay;
+			case MemeFaces.Troll:
+				return troll;
+			case MemeFaces.Unhappy:
+				return unhappy;
+		}
+		return notokay;
 	}
 }
