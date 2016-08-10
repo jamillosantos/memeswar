@@ -30,6 +30,8 @@ namespace Memewars
 	{
 		private Transform _hudTransform;
 
+		private CanvasKill[] _canvasKill;
+
 		static UnityEngine.Object BloodFountain;
 
 		/// <summary>
@@ -509,6 +511,18 @@ namespace Memewars
 
 		void Start()
 		{
+			/// Encontra os CanvasKill globais
+			this._canvasKill = GameObject.FindObjectsOfType<CanvasKill>();
+			/*
+			GameObject[] canvasKill = GameObject.FindGameObjectsWithTag("CanvasKill");
+			this._canvasKill = new CanvasKill[canvasKill.Length];
+			for (int i = 0; i < canvasKill.Length; i++)
+			{
+				this._canvasKill[i] = canvasKill[i].GetComponent<CanvasKill>();
+			}
+			*/
+
+			/// Encontra todos os spawn points
 			this._spawnPoints = GameObject.FindGameObjectsWithTag("Spawnpoint");
 
 			/// Encontra o recurso da fonte de sangue.
@@ -857,6 +871,27 @@ namespace Memewars
 			if (this.TimeSinceLastKill < 40f)
 			{
 				this._killSequence++;
+
+				/// Exibe na tela o UI da façanha.
+				int max = 0, i = 0;
+				bool found = false;
+				foreach (CanvasKill c in this._canvasKill)
+				{
+					if (c.KillAmount == this._killSequence)
+					{
+						c.Show();
+						found = true;
+						break;
+					}
+					if (this._canvasKill[max].KillAmount < c.KillAmount)
+						max = i;
+					i++;
+				}
+				if ((!found) && (this._killSequence >= this._canvasKill[max].KillAmount))
+				{
+					this._canvasKill[max].Show();
+				}
+
 				this.photonView.RPC("ShowAchievement", PhotonTargets.Others, new object[] {
 					this.photonView.owner.ID, this._killSequence
 				});
