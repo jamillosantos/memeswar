@@ -176,7 +176,7 @@ namespace Memewars
 		/// <summary>
 		/// Capacidade máxima do jetpack.
 		/// </summary>
-		private float _jetpackCapacity = 3f;
+		private float _jetpackCapacity = 30f;
 
 		/// <summary>
 		/// Quanto tempo demora o carregamento do jetpack.

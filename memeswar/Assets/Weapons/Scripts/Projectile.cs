@@ -169,6 +169,7 @@ public class Projectile : Photon.MonoBehaviour
 		Collider[] colliders = this.GetComponents<Collider>();
 
 		this._defaultCollider = colliders[0];
+		this._defaultCollider.enabled = false;
 		if (this.photonView.isMine)
 			this.gameObject.layer = Layer.BulletsMyself;
 		else
@@ -182,6 +183,12 @@ public class Projectile : Photon.MonoBehaviour
 			this._weapon = this._stickmanCharacter.Weapon;
 			this.Fire((Vector3)this.photonView.instantiationData[0]);
 		}
+		this.Invoke("EnableCollider", 0.05f);
+	}
+
+	void EnableCollider()
+	{
+		this._defaultCollider.enabled = true;
 	}
 
 	protected virtual void Update()
